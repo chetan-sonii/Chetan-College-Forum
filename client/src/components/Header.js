@@ -15,7 +15,7 @@ import { BiUser } from "react-icons/bi";
 import { BsPower } from "react-icons/bs";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchQuery } from "../redux/slices/topicSlice";
 import { refresh_token, logout } from "../redux/slices/authSlice";
@@ -28,11 +28,10 @@ const Header = () => {
   const { user, token, isHeaderLoading } = useSelector((state) => state.auth);
   const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
 
-  useMemo(() => {
-    if (isAuth) {
-      if (!token) {
-        dispatch(refresh_token());
-      }
+  // side-effect: refresh token if needed
+  useEffect(() => {
+    if (isAuth && !token) {
+      dispatch(refresh_token());
     }
   }, [dispatch, isAuth, token]);
 
@@ -43,9 +42,13 @@ const Header = () => {
     }
   };
 
-  // eslint-disable-next-line
-  return useMemo(() => {
-    return (
+  // safe guards for `user`
+  const hasUser =
+      user && typeof user === "object" && Object.keys(user).length > 0;
+  const isUserEmpty =
+      !user || (typeof user === "object" && Object.keys(user).length === 0);
+
+  return (
       <header>
         <Navbar expand="lg">
           <Container>
@@ -56,80 +59,85 @@ const Header = () => {
             <Navbar.Collapse id="navbarsupportedcontent">
               <Col lg={6} md={8} sm={10}>
                 <Form
-                  className="search-form"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                  }}
+                    className="search-form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                    }}
                 >
                   <InputGroup>
-                    <span style={{ marginLeft: "8px", fontSize: "25px" }}>
-                      <CgSearch />
-                    </span>
+                  <span style={{ marginLeft: "8px", fontSize: "25px" }}>
+                    <CgSearch />
+                  </span>
                     <FormControl
-                      type="text"
-                      placeholder="Search for Topics..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      onKeyDown={handleSubmitSearch}
+                        type="text"
+                        placeholder="Search for Topics..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={handleSubmitSearch}
                     />
                   </InputGroup>
                 </Form>
               </Col>
               <Nav className="align-items-center">
                 {isAuth && isHeaderLoading && (
-                  <>
-                    <span>
-                      <Skeleton
+                    <>
+                  <span>
+                    <Skeleton
                         style={{ marginRight: `8px` }}
                         circle
                         width={45}
                         height={45}
-                      />
-                    </span>
-                    <span>
-                      <Skeleton width={100} height={20} />
-                    </span>
-                  </>
+                    />
+                  </span>
+                      <span>
+                    <Skeleton width={100} height={20} />
+                  </span>
+                    </>
                 )}
-                {isAuth &&
-                  !isHeaderLoading &&
-                  user &&
-                  Object?.entries(user)?.length > 0 && (
+
+                {isAuth && !isHeaderLoading && hasUser && (
                     <Dropdown className="profile">
                       <Dropdown.Toggle
-                        as="div"
-                        id="dropdownMenuButton1"
-                        className="d-flex align-items-center"
+                          as="div"
+                          id="dropdownMenuButton1"
+                          className="d-flex align-items-center"
                       >
-                        <Image src={user?.avatar?.url} />
-                        <span className="user">{`${user?.firstName} ${user?.lastName}`}</span>
+                        <Image
+                            src={user?.avatar?.url || "/placeholder-avatar.png"}
+                            roundedCircle
+                            width={45}
+                            height={45}
+                            alt="avatar"
+                        />
+                        <span className="user">{`${user?.firstName || ""} ${
+                            user?.lastName || ""
+                        }`}</span>
                         <HiOutlineDotsVertical />
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         <Dropdown.Item
-                          as={Link}
-                          to={`/user/${user?.username}`}
-                          className="d-flex align-items-center"
+                            as={Link}
+                            to={`/user/${user?.username || ""}`}
+                            className="d-flex align-items-center"
                         >
                           <BiUser />
                           Profile
                         </Dropdown.Item>
                         <Dropdown.Item
-                          onClick={() => {
-                            dispatch(logout());
-                            navigate("/");
-                          }}
-                          className="d-flex align-items-center"
+                            onClick={() => {
+                              dispatch(logout());
+                              navigate("/");
+                            }}
+                            className="d-flex align-items-center"
                         >
                           <BsPower />
                           Logout
                         </Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
-                  )}
-                {!isAuth &&
-                  !isHeaderLoading &&
-                  Object?.entries(user)?.length === 0 && (
+                )}
+
+                {!isAuth && !isHeaderLoading && isUserEmpty && (
                     <>
                       <Link className="login" to="/login">
                         <Button className="login">Login</Button>
@@ -138,14 +146,13 @@ const Header = () => {
                         <Button className="register">Register</Button>
                       </Link>
                     </>
-                  )}
+                )}
               </Nav>
             </Navbar.Collapse>
           </Container>
         </Navbar>
       </header>
-    );
-  });
+  );
 };
 
 export default Header;
