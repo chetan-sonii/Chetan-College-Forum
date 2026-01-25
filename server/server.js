@@ -27,7 +27,7 @@ app.use(helmet());
 app.use(fileUpload({ useTempFiles: true, tempFileDir: "./tmp" }));
 app.use(
   cors({
-    origin: process.env.REACT_APP_URL,
+    origin: import.meta.env.VITE_URL,
     credentials: true,
   })
 );
