@@ -4,11 +4,11 @@ const Topic = require("../models/topicModel");
 var repliesToDelete = [];
 const nest = (comments, id) => {
   comments
-    .filter((comment) => comment?.parentComment?.toString() === id?.toString())
-    .map((comment) => {
-      repliesToDelete?.push(comment._id);
-      nest(comments, comment?._id.toString());
-    });
+      .filter((comment) => comment?.parentComment?.toString() === id?.toString())
+      .map((comment) => {
+        repliesToDelete?.push(comment._id);
+        nest(comments, comment?._id.toString());
+      });
 };
 
 module.exports = {
@@ -16,9 +16,9 @@ module.exports = {
     try {
       const { id: parentTopic } = req.params;
       const comments = await Comment.find({ parentTopic })
-        .populate({ path: "author", select: { password: 0, __v: 0 } })
-        .lean()
-        .exec();
+          .populate({ path: "author", select: { password: 0, __v: 0 } })
+          .lean()
+          .exec();
       return res.json({
         comments: comments,
         message: "Comments Retrieved!",
@@ -51,6 +51,12 @@ module.exports = {
         path: "author",
         select: { password: 0, __v: 0 },
       });
+
+      // --- Socket.io: Emit new comment to topic room ---
+      const io = req.app.get("io");
+      io.to(id).emit("receive_comment", createdComment);
+      // -------------------------------------------------
+
       return res.status(201).json({
         comment: createdComment,
         message: "Comment Created Successfully!",

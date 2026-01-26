@@ -12,15 +12,43 @@ const topicRoutes = require("./routes/topicRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const userRoutes = require("./routes/userRoutes");
 const path = require("path");
+const http = require("http"); // Import HTTP module
+const { Server } = require("socket.io"); // Import Socket.io
 
 // load .env
 dotenv.config();
 
 // config
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL = process.env.REACT_APP_URL || "http://localhost:3000";
+const CLIENT_URL =
+    process.env.CLIENT_URL || process.env.REACT_APP_URL || "http://localhost:3000";
 
 const app = express();
+const server = http.createServer(app); // Wrap Express app with HTTP server
+
+// --- Socket.io Setup ---
+const io = new Server(server, {
+    cors: {
+        origin: CLIENT_URL,
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
+});
+
+// Store io instance to use in controllers
+app.set("io", io);
+
+io.on("connection", (socket) => {
+    // Join a specific topic room
+    socket.on("join_topic", (topicId) => {
+        socket.join(topicId);
+        console.log(`User with ID: ${socket.id} joined topic room: ${topicId}`);
+    });
+
+    socket.on("disconnect", () => {
+        // console.log("User Disconnected", socket.id);
+    });
+});
 
 // --- Middleware ---
 app.use(express.json());
@@ -75,7 +103,8 @@ app.use((err, req, res, next) => {
 const start = async () => {
     try {
         await connectDB(); // ensure DB connected first
-        const server = app.listen(PORT, () => {
+        // Use server.listen instead of app.listen to enable WebSockets
+        server.listen(PORT, () => {
             console.log(`Server listening on port ${PORT}`);
             console.log(`Accepting requests from: ${CLIENT_URL}`);
         });
