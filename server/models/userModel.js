@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-// ❌ REMOVED: const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const UserSchema = new mongoose.Schema({
   firstName: String,
@@ -34,14 +33,15 @@ const UserSchema = new mongoose.Schema({
     },
   },
   socialNetwork: {
-    facebook: {
-      type: String,
-      trim: true,
-      match:
-          /(?:https?:\/\/)?(?:www\.|m\.|mobile\.|touch\.|mbasic\.)?(?:facebook\.com|fb(?:\.me|\.com))\/(?!$)(?:(?:\w)*#!\/)?(?:pages\/|pg\/)?(?:photo\.php\?fbid=)?(?:[\w\-]*\/)*?(?:\/)?(?:profile\.php\?id=)?([^\/?&\s]*)(?:\/|&|\?)?.*/gm,
-      default: "",
-    },
-    twitter: {
+facebook: {
+type: String,
+    trim: true,
+    match:
+/(?:https?:\/\/)?(?:www\.|m\.|mobile\.|touch\.|mbasic\.)?(?:facebook\.com|fb(?:\.me|\.com))\/(?!$)(?:\w*#!\/)?(?:pages\/|pg\/)?(?:photo\.php\?fbid=)?(?:[\w\-]*\/)*\/?(?:profile\.php\?id=)?([^\/?&\s]*)[\/&?]?.*/gm,
+default: "",
+},
+
+twitter: {
       type: String,
       trim: true,
       match: /^(?:https?:\/\/)?(?:www\.)?twitter\.com\/(#!\/)?[a-zA-Z0-9_]+$/i,
@@ -78,9 +78,7 @@ const UserSchema = new mongoose.Schema({
       default: [],
     },
   ],
-}, { timestamps: true }); // Enable timestamps (createdAt, updatedAt)
-
-// ❌ REMOVED: UserSchema.plugin(AutoIncrement, { inc_field: "UserID" });
+}, { timestamps: true });
 
 // Virtual for getting full name
 UserSchema.virtual("fullname").get(function () {
