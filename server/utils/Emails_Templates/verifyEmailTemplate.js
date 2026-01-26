@@ -280,9 +280,9 @@ module.exports = (user, token) => `
                                                                     </style>
                                                                 <![endif]-->
                                                                 <div align="center">
-                                                                    <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${import.meta.env.VITE_URL}/verify-email?token=${token}" style="height:39px; v-text-anchor:middle; width:197px;" arcsize="10.5%"  stroke="f" fillcolor="#546cfb"><w:anchorlock/><center style="color:#FFFFFF;font-family:roboto;"><![endif]-->
+                                                                    <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${process.env.env.VITE_URL}/verify-email?token=${token}" style="height:39px; v-text-anchor:middle; width:197px;" arcsize="10.5%"  stroke="f" fillcolor="#546cfb"><w:anchorlock/><center style="color:#FFFFFF;font-family:roboto;"><![endif]-->
                                                                     <a
-                                                                        href="${import.meta.env.VITE_URL}/verify-email?token=${token}"
+                                                                        href="${process.env.VITE_URL}/verify-email?token=${token}"
                                                                         target="_blank"
                                                                         class="v-button"
                                                                         style="
@@ -340,7 +340,7 @@ module.exports = (user, token) => `
                                                                     <p style="font-size: 14px; line-height: 140%; text-align: center;">
                                                                         <span style="text-decoration: underline; font-size: 14px; line-height: 19.6px;">
                                                                             <span style="font-size: 16px; line-height: 22.4px;">
-                                                                                <strong><span style="line-height: 22.4px; font-size: 16px;">${import.meta.env.VITE_URL}/verify-email?token=${token}</span></strong>
+                                                                                <strong><span style="line-height: 22.4px; font-size: 16px;">${process.env.env.VITE_URL}/verify-email?token=${token}</span></strong>
                                                                             </span>
                                                                         </span>
                                                                     </p>
