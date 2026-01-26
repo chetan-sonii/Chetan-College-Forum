@@ -181,11 +181,14 @@ const topicSlice = createSlice({
         })
 
         // ADD TOPIC
-        .addCase(addTopic.pending, (state) => {
-          state.addTopic.isLoading = true;
-          state.addTopic.isSuccess = false;
-          state.addTopic.isError = false;
-          state.addTopic.message = "Adding new topic...";
+        .addCase(addTopic.fulfilled, (state, action) => {
+            state.addTopic.isLoading = false;
+            state.addTopic.isSuccess = true;
+            state.addTopic.isError = false;
+            state.topics.push(action.payload.topic);
+            state.addTopic.message = action.payload.message;
+            // FIX: Use _id instead of TopicID
+            state.addTopic.newTopicURL = `/topics/${action.payload.topic._id}/${action.payload.topic.slug}`;
         })
         .addCase(addTopic.fulfilled, (state, action) => {
           state.addTopic.isLoading = false;
@@ -331,4 +334,5 @@ const topicSlice = createSlice({
 export const { resetTopics, resetNewTopic, setSearchQuery, setSortOption } =
     topicSlice.actions;
 
+export default topicSlice.reducer;
 export default topicSlice.reducer;

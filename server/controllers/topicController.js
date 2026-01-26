@@ -77,15 +77,15 @@ module.exports = {
       }
 
       const slug = title
-        .toString()
-        .normalize("NFKD")
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, "-")
-        .replace(/[^\w\-]+/g, "")
-        .replace(/\_/g, "-")
-        .replace(/\-\-+/g, "-")
-        .replace(/\-$/g, "");
+          .toString()
+          .normalize("NFKD")
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/[^\w\-]+/g, "")
+          .replace(/\_/g, "-")
+          .replace(/\-\-+/g, "-")
+          .replace(/\-$/g, "");
 
       let topic = await Topic.create({
         owner: req.user.username,
@@ -93,11 +93,14 @@ module.exports = {
         content: content.trim(),
         slug: slug.trim(),
         tags: createdTags,
+        space: selectedSpace, // <--- CRITICAL FIX: Saving the space
       });
+
       topic = await topic.populate({
         path: "author",
         select: { password: 0, __v: 0 },
       });
+
       return res.status(201).json({
         topic: topic,
         message: "Topic successfully created!",

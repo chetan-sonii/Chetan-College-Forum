@@ -74,9 +74,9 @@ const TopicItem = ({ topic }) => {
                   );
                 })}
           </Nav>
-          <Link to={`/topics/${topic?.TopicID}/${topic?.slug}`}>
-            <h4 className="topic-title">{topic?.title}</h4>
-          </Link>
+            <Link to={`/topics/${topic?._id}/${topic?.slug}`}>
+                <h4 className="topic-title">{topic?.title}</h4>
+            </Link>
           <p className="topic-summary">{topic?.content}</p>
           <div className="topic-meta d-flex align-items-center">
             <div className="topic-writer d-flex align-items-center">
