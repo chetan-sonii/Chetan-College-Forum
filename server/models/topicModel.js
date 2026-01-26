@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 
+// ❌ REMOVED: const AutoIncrement = require("mongoose-sequence")(mongoose);
+
 const TopicSchema = new mongoose.Schema(
     {
         owner: String,
         title: String,
         content: String,
         slug: String,
-        space: String, // <--- ADDED THIS (Required for your form)
+        space: String, // ✅ ADDED: This is required for your controller to work
         upvotes: [
             {
                 type: String,
@@ -39,6 +41,8 @@ const TopicSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+// ❌ REMOVED: TopicSchema.plugin(AutoIncrement, { inc_field: "TopicID" });
 
 TopicSchema.virtual("author", {
     ref: "User",
