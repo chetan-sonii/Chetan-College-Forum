@@ -18,8 +18,7 @@ dotenv.config();
 
 // config
 const PORT = process.env.PORT || 5000;
-const CLIENT_URL =
-    process.env.CLIENT_URL || process.env.REACT_APP_URL || "http://localhost:3000";
+const CLIENT_URL = process.env.REACT_APP_URL || "http://localhost:3000";
 
 const app = express();
 
@@ -43,7 +42,7 @@ app.use(
 // CORS
 app.use(
     cors({
-        origin: process.env.VITE_API_URL || "http://localhost:3000",
+        origin: CLIENT_URL,
         credentials: true,
     })
 );

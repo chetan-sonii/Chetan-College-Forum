@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const AutoIncrement = require("mongoose-sequence")(mongoose);
+// ❌ REMOVED: const AutoIncrement = require("mongoose-sequence")(mongoose);
 
 const UserSchema = new mongoose.Schema({
   firstName: String,
@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
       type: String,
       trim: true,
       match:
-        /(?:https?:\/\/)?(?:www\.|m\.|mobile\.|touch\.|mbasic\.)?(?:facebook\.com|fb(?:\.me|\.com))\/(?!$)(?:(?:\w)*#!\/)?(?:pages\/|pg\/)?(?:photo\.php\?fbid=)?(?:[\w\-]*\/)*?(?:\/)?(?:profile\.php\?id=)?([^\/?&\s]*)(?:\/|&|\?)?.*/gm,
+          /(?:https?:\/\/)?(?:www\.|m\.|mobile\.|touch\.|mbasic\.)?(?:facebook\.com|fb(?:\.me|\.com))\/(?!$)(?:(?:\w)*#!\/)?(?:pages\/|pg\/)?(?:photo\.php\?fbid=)?(?:[\w\-]*\/)*?(?:\/)?(?:profile\.php\?id=)?([^\/?&\s]*)(?:\/|&|\?)?.*/gm,
       default: "",
     },
     twitter: {
@@ -67,32 +67,27 @@ const UserSchema = new mongoose.Schema({
   following: [
     {
       type: String,
+      ref: "User",
       default: [],
     },
   ],
   followers: [
     {
       type: String,
+      ref: "User",
       default: [],
     },
   ],
-});
+}, { timestamps: true }); // Enable timestamps (createdAt, updatedAt)
 
-UserSchema.virtual("user_following", {
-  ref: "User",
-  localField: "following",
-  foreignField: "username",
-});
+// ❌ REMOVED: UserSchema.plugin(AutoIncrement, { inc_field: "UserID" });
 
-UserSchema.virtual("user_followers", {
-  ref: "User",
-  localField: "followers",
-  foreignField: "username",
+// Virtual for getting full name
+UserSchema.virtual("fullname").get(function () {
+  return `${this.firstName} ${this.lastName}`;
 });
 
 UserSchema.set("toObject", { virtuals: true });
 UserSchema.set("toJSON", { virtuals: true });
-
-UserSchema.plugin(AutoIncrement, { inc_field: "userID" });
 
 module.exports = mongoose.model("User", UserSchema);
