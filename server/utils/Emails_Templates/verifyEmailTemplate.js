@@ -1,6 +1,9 @@
+// noinspection CssRedundantUnit
+
 module.exports = (user, token) => `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<!--suppress ALL -->
+<html lang="en">
     <head>
         <!--[if gte mso 9]>
             <xml>
@@ -157,7 +160,7 @@ module.exports = (user, token) => `
                                                 style="
                                                     height: 100%;
                                                     padding: 0px;
-                                                    border-top: 0px solid transparent;
+                                                    border-top: 0 solid transparent;
                                                     border-left: 0px solid transparent;
                                                     border-right: 0px solid transparent;
                                                     border-bottom: 0px solid transparent;
@@ -255,12 +258,12 @@ module.exports = (user, token) => `
                                                             <td class="v-container-padding-padding" style="overflow-wrap: break-word; word-break: break-word; padding: 40px 30px 20px 40px; font-family: roboto;" align="left">
                                                                 <div style="color: #4b4a4a; line-height: 190%; text-align: left; word-wrap: break-word;">
                                                                     <p style="font-size: 14px; line-height: 190%;">
-                                                                        <span style="font-size: 18px; line-height: 34.2px;">
-                                                                            <strong><span style="line-height: 34.2px; font-size: 18px;">Dear ${user.firstName},</span></strong>
+                                                                        <span style="font-size: 18px; line-height: 34px;">
+                                                                            <strong><span style="line-height: 34px; font-size: 18px;">Dear ${user.firstName},</span></strong>
                                                                         </span>
                                                                     </p>
                                                                     <p style="font-size: 14px; line-height: 190%;">
-                                                                        <span style="font-size: 16px; line-height: 30.4px;">We're excited to have you get started! First you need to confirm your account. Just click the button below.</span>
+                                                                        <span style="font-size: 16px; line-height: 30px;">We're excited to have you get started! First you need to confirm your account. Just click the button below.</span>
                                                                     </p>
                                                                 </div>
                                                             </td>
@@ -280,7 +283,7 @@ module.exports = (user, token) => `
                                                                     </style>
                                                                 <![endif]-->
                                                                 <div align="center">
-                                                                    <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${process.env.env.VITE_URL}/verify-email?token=${token}" style="height:39px; v-text-anchor:middle; width:197px;" arcsize="10.5%"  stroke="f" fillcolor="#546cfb"><w:anchorlock/><center style="color:#FFFFFF;font-family:roboto;"><![endif]-->
+                                                                    <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${process.env.VITE_URL}/verify-email?token=${token}" style="height:39px; v-text-anchor:middle; width:197px;" arcsize="10.5%"  stroke="f" fillcolor="#546cfb"><w:anchorlock/><center style="color:#FFFFFF;font-family:roboto;"><![endif]-->
                                                                     <a
                                                                         href="${process.env.VITE_URL}/verify-email?token=${token}"
                                                                         target="_blank"
@@ -306,8 +309,8 @@ module.exports = (user, token) => `
                                                                         "
                                                                     >
                                                                         <span style="display: block; padding: 10px 20px; line-height: 120%;">
-                                                                            <span style="font-size: 16px; line-height: 19.2px; font-family: roboto;">
-                                                                                <strong><span style="line-height: 19.2px; font-size: 16px;">Confirm Your Account</span></strong>
+                                                                            <span style="font-size: 16px; line-height: 19px; font-family: roboto;">
+                                                                                <strong><span style="line-height: 19px; font-size: 16px;">Confirm Your Account</span></strong>
                                                                             </span>
                                                                         </span>
                                                                     </a>
@@ -324,7 +327,7 @@ module.exports = (user, token) => `
                                                             <td class="v-container-padding-padding" style="overflow-wrap: break-word; word-break: break-word; padding: 10px 30px 10px 40px; font-family: roboto;" align="left">
                                                                 <div style="line-height: 190%; text-align: left; word-wrap: break-word;">
                                                                     <p style="font-size: 14px; line-height: 190%;">
-                                                                        <span style="font-size: 16px; line-height: 30.4px;">If that button doesn't work, please copy and paste the following link in your browser:</span>
+                                                                        <span style="font-size: 16px; line-height: 30px;">If that button doesn't work, please copy and paste the following link in your browser:</span>
                                                                     </p>
                                                                 </div>
                                                             </td>
@@ -338,9 +341,9 @@ module.exports = (user, token) => `
                                                             <td class="v-container-padding-padding" style="overflow-wrap: break-word; word-break: break-word; padding: 10px; font-family: roboto;" align="left">
                                                                 <div style="color: #546cfb; line-height: 140%; text-align: left; word-wrap: break-word;">
                                                                     <p style="font-size: 14px; line-height: 140%; text-align: center;">
-                                                                        <span style="text-decoration: underline; font-size: 14px; line-height: 19.6px;">
-                                                                            <span style="font-size: 16px; line-height: 22.4px;">
-                                                                                <strong><span style="line-height: 22.4px; font-size: 16px;">${process.env.env.VITE_URL}/verify-email?token=${token}</span></strong>
+                                                                        <span style="text-decoration: underline; font-size: 14px; line-height: 20px;">
+                                                                            <span style="font-size: 16px; line-height: 22px;">
+                                                                                <strong><span style="line-height: 22px; font-size: 16px;">${process.env.VITE_URL}/verify-email?token=${token}</span></strong>
                                                                             </span>
                                                                         </span>
                                                                     </p>
@@ -356,13 +359,13 @@ module.exports = (user, token) => `
                                                             <td class="v-container-padding-padding" style="overflow-wrap: break-word; word-break: break-word; padding: 40px 30px 20px 40px; font-family: roboto;" align="left">
                                                                 <div style="color: #4b4a4a; line-height: 190%; text-align: left; word-wrap: break-word;">
                                                                     <p style="font-size: 14px; line-height: 190%;">
-                                                                        <span style="font-size: 18px; line-height: 34.2px;"><span style="line-height: 34.2px; font-size: 18px;">Cheers,</span></span>
+                                                                        <span style="font-size: 18px; line-height: 34px;"><span style="line-height: 34px; font-size: 18px;">Cheers,</span></span>
                                                                     </p>
                                                                     <p style="font-size: 14px; line-height: 190%;">
-                                                                        <span style="font-size: 18px; line-height: 34.2px;">
-                                                                            <strong><span style="line-height: 34.2px; font-size: 18px;">CHETAN Owner.</span></strong>
+                                                                        <span style="font-size: 18px; line-height: 34px;">
+                                                                            <strong><span style="line-height: 34px; font-size: 18px;">CHETAN Owner.</span></strong>
                                                                         </span>
-                                                                        <span style="font-size: 16px; line-height: 30.4px;"></span>
+                                                                        <span style="font-size: 16px; line-height: 30px;"></span>
                                                                     </p>
                                                                 </div>
                                                             </td>
@@ -741,7 +744,7 @@ module.exports = (user, token) => `
                                                     </tbody>
                                                 </table>
 
-                                                <table style="font-family: roboto;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
+                                                <table style="font-family: roboto,serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
                                                     <tbody>
                                                         <tr>
                                                             <td class="v-container-padding-padding" style="overflow-wrap: break-word; word-break: break-word; padding: 10px; font-family: roboto;" align="left">

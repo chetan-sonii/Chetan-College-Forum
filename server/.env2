@@ -1,0 +1,28 @@
+# App Global Variables
+PORT=5000
+VITE_API_URL='http://localhost:3000'
+
+# MongoDB URL
+MONGODB_URL_CONNECTION='mongodb+srv://chetansonii2000_db_user:chetan309204@collegeforum.y1vvpxj.mongodb.net/'
+
+# JWT Secret Keys And Their Expiration.
+ACCESS_TOKEN_SECRET_KEY='chetanaccess'
+REFRESH_TOKEN_SECRET_KEY='chetanrefresh'
+EMAIL_VERIFY_TOKEN_SECRET_KEY='chetanaccess'
+RESET_PASSWORD_TOKEN_SECRET_KEY='chetanrefresh'
+
+ACCESS_TOKEN_EXPIRATION='5m'
+REFRESH_TOKEN_EXPIRATION='1d'
+EMAIL_VERIFY_TOKEN_EXPIRATION='20m'
+RESET_PASSWORD_TOKEN_EXPIRATION='20m'
+
+# Cloudinary Setup
+CLOUDINARY_NAME='chetan-cloud-1'
+CLOUDINARY_API_KEY='456324195757746'
+CLOUDINARY_API_SECRET='JMdsOonvc7MA0MLUdv7hcm_ns2E'
+
+# SMTP Setup
+SMTP_SERVER='smtp.gmail.com'
+SMTP_PORT='587'
+SMPT_USERNAME='chetansonii2000@gmail.com'
+SMPT_PASSWORD='sbycbveadhzmellp'
