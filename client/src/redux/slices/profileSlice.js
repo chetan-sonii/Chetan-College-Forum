@@ -12,60 +12,55 @@ const initialState = {
 };
 
 export const getUserProfile = createAsyncThunk(
-  "profile/getUserProfile",
-  async (username) => {
-    try {
-      const { data } = await axios.get(`/api/user/${username}`, username);
-      return data;
-    } catch (err) {
-      console.log(err.message);
+    "profile/getUserProfile",
+    async (username, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/user/${username}`);
+        return data;
+      } catch (err) {
+        console.log(err.message);
+        return rejectWithValue(err.message);
+      }
     }
-  }
 );
 
 export const getUserComments = createAsyncThunk(
-  "profile/getUserComments",
-  async (username) => {
-    try {
-      const { data } = await axios.get(
-        `/api/user/${username}/comments`,
-        username
-      );
-      return data;
-    } catch (err) {
-      console.log(err.message);
+    "profile/getUserComments",
+    async (username, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/user/${username}/comments`);
+        return data;
+      } catch (err) {
+        console.log(err.message);
+        return rejectWithValue(err.message);
+      }
     }
-  }
 );
 
 export const getUserFollowing = createAsyncThunk(
-  "profile/getUserFollowing",
-  async (username) => {
-    try {
-      const { data } = await axios.get(
-        `/api/user/${username}/following`,
-        username
-      );
-      return data;
-    } catch (err) {
-      console.log(err.message);
+    "profile/getUserFollowing",
+    async (username, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/user/${username}/following`);
+        return data;
+      } catch (err) {
+        console.log(err.message);
+        return rejectWithValue(err.message);
+      }
     }
-  }
 );
 
 export const getUserFollowers = createAsyncThunk(
-  "profile/getUserFollowers",
-  async (username) => {
-    try {
-      const { data } = await axios.get(
-        `/api/user/${username}/followers`,
-        username
-      );
-      return data;
-    } catch (err) {
-      console.log(err.message);
+    "profile/getUserFollowers",
+    async (username, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/user/${username}/followers`);
+        return data;
+      } catch (err) {
+        console.log(err.message);
+        return rejectWithValue(err.message);
+      }
     }
-  }
 );
 
 const profileSlice = createSlice({
@@ -74,54 +69,62 @@ const profileSlice = createSlice({
   reducers: {
     resetUserProfile: (state) => {
       state.userProfile = {};
-      state.isLoading = false;
+      state.profileIsLoading = false;
     },
     resetUserComments: (state) => {
       state.userComments = [];
-      state.isLoading = false;
+      state.commentsIsLoading = false;
     },
   },
-  extraReducers: {
-    [getUserProfile.pending]: (state) => {
-      state.profileIsLoading = true;
-    },
-    [getUserProfile.fulfilled]: (state, action) => {
-      state.profileIsLoading = false;
-      state.userProfile = action.payload;
-    },
-    [getUserProfile.rejected]: (state) => {
-      state.profileIsLoading = false;
-    },
-    [getUserComments.pending]: (state) => {
-      state.commentsIsLoading = true;
-    },
-    [getUserComments.fulfilled]: (state, action) => {
-      state.commentsIsLoading = false;
-      state.userComments = action.payload;
-    },
-    [getUserComments.rejected]: (state) => {
-      state.commentsIsLoading = false;
-    },
-    [getUserFollowing.pending]: (state) => {
-      state.followIsLoading = true;
-    },
-    [getUserFollowing.fulfilled]: (state, action) => {
-      state.followIsLoading = false;
-      state.userFollowing = action.payload;
-    },
-    [getUserFollowing.rejected]: (state) => {
-      state.followIsLoading = false;
-    },
-    [getUserFollowers.pending]: (state) => {
-      state.followIsLoading = true;
-    },
-    [getUserFollowers.fulfilled]: (state, action) => {
-      state.followIsLoading = false;
-      state.userFollowers = action.payload;
-    },
-    [getUserFollowers.rejected]: (state) => {
-      state.followIsLoading = false;
-    },
+  extraReducers: (builder) => {
+    builder
+        // GET PROFILE
+        .addCase(getUserProfile.pending, (state) => {
+          state.profileIsLoading = true;
+        })
+        .addCase(getUserProfile.fulfilled, (state, action) => {
+          state.profileIsLoading = false;
+          state.userProfile = action.payload;
+        })
+        .addCase(getUserProfile.rejected, (state) => {
+          state.profileIsLoading = false;
+        })
+
+        // GET COMMENTS
+        .addCase(getUserComments.pending, (state) => {
+          state.commentsIsLoading = true;
+        })
+        .addCase(getUserComments.fulfilled, (state, action) => {
+          state.commentsIsLoading = false;
+          state.userComments = action.payload;
+        })
+        .addCase(getUserComments.rejected, (state) => {
+          state.commentsIsLoading = false;
+        })
+
+        // GET FOLLOWING
+        .addCase(getUserFollowing.pending, (state) => {
+          state.followIsLoading = true;
+        })
+        .addCase(getUserFollowing.fulfilled, (state, action) => {
+          state.followIsLoading = false;
+          state.userFollowing = action.payload;
+        })
+        .addCase(getUserFollowing.rejected, (state) => {
+          state.followIsLoading = false;
+        })
+
+        // GET FOLLOWERS
+        .addCase(getUserFollowers.pending, (state) => {
+          state.followIsLoading = true;
+        })
+        .addCase(getUserFollowers.fulfilled, (state, action) => {
+          state.followIsLoading = false;
+          state.userFollowers = action.payload;
+        })
+        .addCase(getUserFollowers.rejected, (state) => {
+          state.followIsLoading = false;
+        });
   },
 });
 

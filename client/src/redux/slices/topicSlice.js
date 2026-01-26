@@ -27,112 +27,109 @@ const initialState = {
 };
 
 export const getAllTopics = createAsyncThunk(
-  "topic/getAllTopics",
-  async ({ sortOption, searchQuery }, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get("/api/topics", {
-        params: { sort: sortOption, search: searchQuery },
-      });
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/getAllTopics",
+    async ({ sortOption, searchQuery }, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get("/api/topics", {
+          params: { sort: sortOption, search: searchQuery },
+        });
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const getTopic = createAsyncThunk(
-  "topic/getTopic",
-  async ({ id, slug }, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`/api/topics/${id}/${slug}`, {
-        id,
-        slug,
-      });
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/getTopic",
+    async ({ id, slug }, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/topics/${id}/${slug}`);
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const addTopic = createAsyncThunk(
-  "topic/addTopic",
-  async (
-    { title, content, selectedSpace, selectedTags },
-    { rejectWithValue }
-  ) => {
-    try {
-      const { data } = await axios.post("/api/topics", {
-        title,
-        content,
-        selectedSpace,
-        selectedTags,
-      });
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/addTopic",
+    async (
+        { title, content, selectedSpace, selectedTags },
+        { rejectWithValue }
+    ) => {
+      try {
+        const { data } = await axios.post("/api/topics", {
+          title,
+          content,
+          selectedSpace,
+          selectedTags,
+        });
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const deleteTopic = createAsyncThunk(
-  "topic/deleteTopic",
-  async (id, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.delete(`/api/topics/${id}`);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/deleteTopic",
+    async (id, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.delete(`/api/topics/${id}`);
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const toggleUpvoteTopic = createAsyncThunk(
-  "topic/toggleUpvoteTopic",
-  async (id, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.post(`/api/topics/${id}/upvote`, id);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/toggleUpvoteTopic",
+    async (id, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.post(`/api/topics/${id}/upvote`);
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const toggleDownvoteTopic = createAsyncThunk(
-  "topic/toggleDownvoteTopic",
-  async (id, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.post(`/api/topics/${id}/downvote`, id);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/toggleDownvoteTopic",
+    async (id, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.post(`/api/topics/${id}/downvote`);
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const getTopContributors = createAsyncThunk(
-  "topic/getTopContributors",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`/api/topics/contributors`);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/getTopContributors",
+    async (_, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/topics/contributors`);
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 export const getSpaces = createAsyncThunk(
-  "topic/getSpaces",
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data } = await axios.get(`/api/topics/spaces`);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response.data);
+    "topic/getSpaces",
+    async (_, { rejectWithValue }) => {
+      try {
+        const { data } = await axios.get(`/api/topics/spaces`);
+        return data;
+      } catch (err) {
+        return rejectWithValue(err.response.data);
+      }
     }
-  }
 );
 
 const topicSlice = createSlice({
@@ -157,175 +154,181 @@ const topicSlice = createSlice({
       state.sortOption = action.payload;
     },
   },
-  extraReducers: {
-    [getAllTopics.pending]: (state) => {
-      state.getAllTopicsIsLoading = true;
-    },
-    [getAllTopics.fulfilled]: (state, action) => {
-      state.getAllTopicsIsLoading = false;
-      state.topics = action.payload;
-    },
-    [getAllTopics.rejected]: (state) => {
-      state.getAllTopicsIsLoading = false;
-    },
-    [getTopic.pending]: (state) => {
-      state.getTopicIsLoading = true;
-    },
-    [getTopic.fulfilled]: (state, action) => {
-      state.getTopicIsLoading = false;
-      state.topic = action.payload;
-    },
-    [getTopic.rejected]: (state) => {
-      state.getTopicIsLoading = false;
-    },
-    [addTopic.pending]: (state) => {
-      state.addTopic.isLoading = true;
-      state.addTopic.isSuccess = false;
-      state.addTopic.isError = false;
-      state.addTopic.message = "Adding new topic...";
-    },
-    [addTopic.fulfilled]: (state, action) => {
-      state.addTopic.isLoading = false;
-      state.addTopic.isSuccess = true;
-      state.addTopic.isError = false;
-      state.topics.push(action.payload.topic);
-      state.addTopic.message = action.payload.message;
-      state.addTopic.newTopicURL = `/topics/${action.payload.topic.TopicID}/${action.payload.topic.slug}`;
-    },
-    [addTopic.rejected]: (state, action) => {
-      state.addTopic.isLoading = false;
-      state.addTopic.isSuccess = false;
-      state.addTopic.isError = true;
-      state.addTopic.message = action.payload.message;
-    },
-    [toggleUpvoteTopic.pending]: (state) => {
-      state.votingIsLoading = true;
-    },
-    [toggleUpvoteTopic.fulfilled]: (state, action) => {
-      state.votingIsLoading = false;
+  extraReducers: (builder) => {
+    builder
+        // GET ALL TOPICS
+        .addCase(getAllTopics.pending, (state) => {
+          state.getAllTopicsIsLoading = true;
+        })
+        .addCase(getAllTopics.fulfilled, (state, action) => {
+          state.getAllTopicsIsLoading = false;
+          state.topics = action.payload;
+        })
+        .addCase(getAllTopics.rejected, (state) => {
+          state.getAllTopicsIsLoading = false;
+        })
 
-      if (Object.keys(state.topic).length > 0) {
-        if (state.topic._id === action.payload.topicId) {
-          if (state.topic.upvotes.includes(action.payload.username)) {
-            state.topic.upvotes = state.topic.upvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          } else {
-            state.topic.upvotes.push(action.payload.username);
-            state.topic.downvotes = state.topic.downvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          }
-        }
-      }
+        // GET SINGLE TOPIC
+        .addCase(getTopic.pending, (state) => {
+          state.getTopicIsLoading = true;
+        })
+        .addCase(getTopic.fulfilled, (state, action) => {
+          state.getTopicIsLoading = false;
+          state.topic = action.payload;
+        })
+        .addCase(getTopic.rejected, (state) => {
+          state.getTopicIsLoading = false;
+        })
 
-      state.topics.map((topic) => {
-        if (topic._id === action.payload.topicId) {
-          if (topic.upvotes.includes(action.payload.username)) {
-            topic.upvotes = topic.upvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          } else {
-            topic.upvotes.push(action.payload.username);
-            topic.downvotes = topic.downvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          }
-          return topic;
-        }
-        return topic;
-      });
-    },
-    [toggleUpvoteTopic.rejected]: (state) => {
-      state.votingIsLoading = false;
-    },
-    [toggleDownvoteTopic.pending]: (state) => {
-      state.votingIsLoading = true;
-    },
-    [toggleDownvoteTopic.fulfilled]: (state, action) => {
-      state.votingIsLoading = false;
+        // ADD TOPIC
+        .addCase(addTopic.pending, (state) => {
+          state.addTopic.isLoading = true;
+          state.addTopic.isSuccess = false;
+          state.addTopic.isError = false;
+          state.addTopic.message = "Adding new topic...";
+        })
+        .addCase(addTopic.fulfilled, (state, action) => {
+          state.addTopic.isLoading = false;
+          state.addTopic.isSuccess = true;
+          state.addTopic.isError = false;
+          state.topics.push(action.payload.topic);
+          state.addTopic.message = action.payload.message;
+          state.addTopic.newTopicURL = `/topics/${action.payload.topic.TopicID}/${action.payload.topic.slug}`;
+        })
+        .addCase(addTopic.rejected, (state, action) => {
+          state.addTopic.isLoading = false;
+          state.addTopic.isSuccess = false;
+          state.addTopic.isError = true;
+          state.addTopic.message = action.payload.message;
+        })
 
-      if (Object.keys(state.topic).length > 0) {
-        if (state.topic._id === action.payload.topicId) {
-          if (state.topic.downvotes.includes(action.payload.username)) {
-            state.topic.downvotes = state.topic.downvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          } else {
-            state.topic.downvotes.push(action.payload.username);
-            state.topic.upvotes = state.topic.upvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          }
-        }
-      }
+        // TOGGLE UPVOTE
+        .addCase(toggleUpvoteTopic.pending, (state) => {
+          state.votingIsLoading = true;
+        })
+        .addCase(toggleUpvoteTopic.fulfilled, (state, action) => {
+          state.votingIsLoading = false;
 
-      state.topics.map((topic) => {
-        if (topic._id === action.payload.topicId) {
-          if (topic.downvotes.includes(action.payload.username)) {
-            topic.downvotes = topic.downvotes.filter(
-              (id) => id !== action.payload.username
-            );
-          } else {
-            topic.downvotes.push(action.payload.username);
-            topic.upvotes = topic.upvotes.filter(
-              (id) => id !== action.payload.username
-            );
+          const updateVote = (item) => {
+            if (item._id === action.payload.topicId) {
+              if (item.upvotes.includes(action.payload.username)) {
+                item.upvotes = item.upvotes.filter(
+                    (id) => id !== action.payload.username
+                );
+              } else {
+                item.upvotes.push(action.payload.username);
+                item.downvotes = item.downvotes.filter(
+                    (id) => id !== action.payload.username
+                );
+              }
+            }
+          };
+
+          // Update single topic view if active
+          if (state.topic && Object.keys(state.topic).length > 0) {
+            updateVote(state.topic);
           }
-          return topic;
-        }
-        return topic;
-      });
-    },
-    [toggleDownvoteTopic.rejected]: (state) => {
-      state.votingIsLoading = false;
-    },
-    [deleteTopic.pending]: (state) => {
-      state.deleteTopicIsLoading = true;
-      state.isError = false;
-      state.isSuccess = false;
-      state.message = "Deleting topic...";
-    },
-    [deleteTopic.fulfilled]: (state, action) => {
-      state.deleteTopicIsLoading = false;
-      state.isError = false;
-      state.isSuccess = true;
-      state.topic = {};
-      state.topics = state.topics.filter(
-        (t) => t._id !== action.payload.topicId
-      );
-      state.message = action.payload.message;
-    },
-    [deleteTopic.rejected]: (state, action) => {
-      state.deleteTopicIsLoading = false;
-      state.isError = true;
-      state.isSuccess = false;
-      state.message = action.payload.message;
-    },
-    [getTopContributors.pending]: (state) => {
-      state.topContributorsIsLoading = true;
-    },
-    [getTopContributors.fulfilled]: (state, action) => {
-      state.topContributorsIsLoading = false;
-      state.topContributors = action.payload;
-    },
-    [getTopContributors.rejected]: (state) => {
-      state.topContributorsIsLoading = false;
-    },
-    [getSpaces.pending]: (state) => {
-      state.getSpacesLoading = true;
-    },
-    [getSpaces.fulfilled]: (state, action) => {
-      state.getSpacesLoading = false;
-      state.spaces = action.payload;
-    },
-    [getSpaces.rejected]: (state) => {
-      state.getSpacesLoading = false;
-    },
+
+          // Update topic in list view
+          const listTopic = state.topics.find(
+              (t) => t._id === action.payload.topicId
+          );
+          if (listTopic) {
+            updateVote(listTopic);
+          }
+        })
+        .addCase(toggleUpvoteTopic.rejected, (state) => {
+          state.votingIsLoading = false;
+        })
+
+        // TOGGLE DOWNVOTE
+        .addCase(toggleDownvoteTopic.pending, (state) => {
+          state.votingIsLoading = true;
+        })
+        .addCase(toggleDownvoteTopic.fulfilled, (state, action) => {
+          state.votingIsLoading = false;
+
+          const updateVote = (item) => {
+            if (item._id === action.payload.topicId) {
+              if (item.downvotes.includes(action.payload.username)) {
+                item.downvotes = item.downvotes.filter(
+                    (id) => id !== action.payload.username
+                );
+              } else {
+                item.downvotes.push(action.payload.username);
+                item.upvotes = item.upvotes.filter(
+                    (id) => id !== action.payload.username
+                );
+              }
+            }
+          };
+
+          // Update single topic view if active
+          if (state.topic && Object.keys(state.topic).length > 0) {
+            updateVote(state.topic);
+          }
+
+          // Update topic in list view
+          const listTopic = state.topics.find(
+              (t) => t._id === action.payload.topicId
+          );
+          if (listTopic) {
+            updateVote(listTopic);
+          }
+        })
+        .addCase(toggleDownvoteTopic.rejected, (state) => {
+          state.votingIsLoading = false;
+        })
+
+        // DELETE TOPIC
+        .addCase(deleteTopic.pending, (state) => {
+          state.deleteTopicIsLoading = true;
+          state.isError = false;
+          state.isSuccess = false;
+          state.message = "Deleting topic...";
+        })
+        .addCase(deleteTopic.fulfilled, (state, action) => {
+          state.deleteTopicIsLoading = false;
+          state.isError = false;
+          state.isSuccess = true;
+          state.topic = {};
+          state.topics = state.topics.filter(
+              (t) => t._id !== action.payload.topicId
+          );
+          state.message = action.payload.message;
+        })
+        .addCase(deleteTopic.rejected, (state, action) => {
+          state.deleteTopicIsLoading = false;
+          state.isError = true;
+          state.isSuccess = false;
+          state.message = action.payload.message;
+        })
+
+        // GET CONTRIBUTORS & SPACES
+        .addCase(getTopContributors.pending, (state) => {
+          state.topContributorsIsLoading = true;
+        })
+        .addCase(getTopContributors.fulfilled, (state, action) => {
+          state.topContributorsIsLoading = false;
+          state.topContributors = action.payload;
+        })
+        .addCase(getTopContributors.rejected, (state) => {
+          state.topContributorsIsLoading = false;
+        })
+        .addCase(getSpaces.pending, (state) => {
+          state.getSpacesLoading = true;
+        })
+        .addCase(getSpaces.fulfilled, (state, action) => {
+          state.getSpacesLoading = false;
+          state.spaces = action.payload;
+        })
+        .addCase(getSpaces.rejected, (state) => {
+          state.getSpacesLoading = false;
+        });
   },
 });
 
 export const { resetTopics, resetNewTopic, setSearchQuery, setSortOption } =
-  topicSlice.actions;
+    topicSlice.actions;
 
 export default topicSlice.reducer;

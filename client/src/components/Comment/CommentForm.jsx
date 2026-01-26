@@ -8,7 +8,7 @@ const CommentForm = ({ topic, onSubmitting, passedComment = null }) => {
   const [comment, setComment] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -16,7 +16,7 @@ const CommentForm = ({ topic, onSubmitting, passedComment = null }) => {
       navigate("/login");
       return;
     }
-    if (!comment || comment?.trim().length === 0) return;
+    if (!comment || comment.trim().length === 0) return;
     const id = topic?._id;
     const parentComment = passedComment?._id || null;
     try {
@@ -29,23 +29,23 @@ const CommentForm = ({ topic, onSubmitting, passedComment = null }) => {
   };
 
   return (
-    <Form className="floating" onSubmit={handleAddComment}>
-      <Form.Group className="form-group" as={Col} controlId="topicTitle">
-        <Form.Control
-          as="textarea"
-          rows={3}
-          type="text"
-          name="comment"
-          value={comment}
-          placeholder="Enter comment here..."
-          onChange={(e) => setComment(e.target.value)}
-        />
-        <Form.Label>Your reply goes here...</Form.Label>
-      </Form.Group>
-      <Button type="submit" className="float-end">
-        Post Comment
-      </Button>
-    </Form>
+      <Form className="floating" onSubmit={handleAddComment}>
+        <Form.Group className="form-group" as={Col} controlId="commentText">
+          <Form.Control
+              as="textarea"
+              rows={3}
+              type="text"
+              name="comment"
+              value={comment}
+              placeholder="Enter comment here..."
+              onChange={(e) => setComment(e.target.value)}
+          />
+          <Form.Label>Your reply goes here...</Form.Label>
+        </Form.Group>
+        <Button type="submit" className="float-end">
+          Post Comment
+        </Button>
+      </Form>
   );
 };
 

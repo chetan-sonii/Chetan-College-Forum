@@ -14,7 +14,7 @@ const Home = () => {
   const { sortOption, searchQuery } = useSelector((state) => state.topic);
 
   useEffect(() => {
-    document.title = `Home | CHETAN Forum`;
+    document.title = "Home | CHETAN Forum";
   }, []);
 
   useEffect(() => {
@@ -23,42 +23,44 @@ const Home = () => {
   }, [dispatch, sortOption, searchQuery]);
 
   return (
-    <>
-      <main>
-        <Container>
-          <Row>
-            <LeftSidebar />
-            <Col lg={6} className="main-content">
-              <div className="filter">
-                <Form.Select
-                  name="topicsSort"
-                  className="custom-select"
-                  onChange={(e) => dispatch(setSortOption(e.target.value))}
-                >
-                  <option value="latest">Latest topics</option>
-                  <option value="popular">Most popular topics</option>
-                  <option value="most_replied">Most replied topics</option>
-                  <option value="most_upvoted">Most upvoted topics</option>
-                </Form.Select>
-              </div>
-              <div className="topics">
-                {getAllTopicsIsLoading && (
-                  <>
-                    <SkeletonTopicItem />
-                    <SkeletonTopicItem />
-                  </>
-                )}
-                {!getAllTopicsIsLoading &&
-                  topics?.map((topic, idx) => (
-                    <TopicItem key={idx} topic={topic} />
-                  ))}
-              </div>
-            </Col>
-            <RightSidebar />
-          </Row>
-        </Container>
-      </main>
-    </>
+      <>
+        <main>
+          <Container>
+            <Row>
+              <LeftSidebar />
+              <Col lg={6} className="main-content">
+                <div className="filter">
+                  <Form.Select
+                      name="topicsSort"
+                      className="custom-select"
+                      onChange={(e) => dispatch(setSortOption(e.target.value))}
+                      value={sortOption} // Controlled component best practice
+                  >
+                    <option value="latest">Latest topics</option>
+                    <option value="popular">Most popular topics</option>
+                    <option value="most_replied">Most replied topics</option>
+                    <option value="most_upvoted">Most upvoted topics</option>
+                  </Form.Select>
+                </div>
+                <div className="topics">
+                  {getAllTopicsIsLoading ? (
+                      <>
+                        <SkeletonTopicItem />
+                        <SkeletonTopicItem />
+                      </>
+                  ) : (
+                      topics?.map((topic) => (
+                          // Use unique ID instead of index for better rendering performance
+                          <TopicItem key={topic._id} topic={topic} />
+                      ))
+                  )}
+                </div>
+              </Col>
+              <RightSidebar />
+            </Row>
+          </Container>
+        </main>
+      </>
   );
 };
 

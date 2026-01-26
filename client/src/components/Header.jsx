@@ -37,16 +37,13 @@ const Header = () => {
 
   const handleSubmitSearch = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission refresh
       dispatch(setSearchQuery(search));
       navigate("/");
     }
   };
 
-  // safe guards for `user`
-  const hasUser =
-      user && typeof user === "object" && Object.keys(user).length > 0;
-  const isUserEmpty =
-      !user || (typeof user === "object" && Object.keys(user).length === 0);
+  const hasUser = user && Object.keys(user).length > 0;
 
   return (
       <header>
@@ -83,7 +80,7 @@ const Header = () => {
                     <>
                   <span>
                     <Skeleton
-                        style={{ marginRight: `8px` }}
+                        style={{ marginRight: "8px" }}
                         circle
                         width={45}
                         height={45}
@@ -101,6 +98,7 @@ const Header = () => {
                           as="div"
                           id="dropdownMenuButton1"
                           className="d-flex align-items-center"
+                          style={{ cursor: "pointer" }}
                       >
                         <Image
                             src={user?.avatar?.url || "/placeholder-avatar.png"}
@@ -137,7 +135,7 @@ const Header = () => {
                     </Dropdown>
                 )}
 
-                {!isAuth && !isHeaderLoading && isUserEmpty && (
+                {!isAuth && !isHeaderLoading && (
                     <>
                       <Link className="login" to="/login">
                         <Button className="login">Login</Button>

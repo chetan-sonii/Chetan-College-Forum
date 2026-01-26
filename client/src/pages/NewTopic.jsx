@@ -9,13 +9,13 @@ import { addTopic, resetNewTopic, getSpaces } from "../redux/slices/topicSlice";
 const NewTopic = () => {
   const dispatch = useDispatch();
   const { message, isLoading, isSuccess, isError, newTopicURL } = useSelector(
-    (state) => state.topic.addTopic
+      (state) => state.topic.addTopic
   );
 
   const { spaces } = useSelector((state) => state.topic);
 
   useEffect(() => {
-    document.title = `Add New Topic | CHETAN Forum`;
+    document.title = "Add New Topic | CHETAN Forum";
   }, []);
 
   useEffect(() => {
@@ -23,13 +23,11 @@ const NewTopic = () => {
     dispatch(getSpaces());
   }, [dispatch]);
 
-  var options = [];
-
-  if (spaces && spaces?.length > 0) {
-    spaces.forEach((space) => {
-      options.push({ value: space.name, label: space.name });
-    });
-  }
+  // Clean Refactor: Use map instead of forEach/push
+  const options = spaces?.map((space) => ({
+    value: space.name,
+    label: space.name,
+  })) || [];
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -50,96 +48,96 @@ const NewTopic = () => {
   };
 
   return (
-    <main>
-      <Container>
-        <Row className="new-topic align-items-center justify-content-center">
-          <Col lg={8}>
-            <section className="new-topic-form">
-              {isLoading && <div className="loader"></div>}
-              <h5 className="section-title">Add New Topic</h5>
-              {message && (
-                <div
-                  className={`message ${isError ? "error" : ""} ${
-                    isSuccess ? "success" : ""
-                  } ${isLoading ? "info" : ""}`}
-                >
-                  {`${message} `}
-                  {newTopicURL && (
-                    <Link to={newTopicURL}>Click here to preview it.</Link>
-                  )}
-                </div>
-              )}
-              <Form className="floating" onSubmit={handleSubmit}>
-                <Form.Group
-                  className="form-group mb-3"
-                  as={Col}
-                  controlId="topicTitle"
-                >
-                  <Form.Control
-                    type="text"
-                    name="title"
-                    value={title}
-                    disabled={isLoading}
-                    placeholder="Enter topic title..."
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                  <Form.Label>Topic Title</Form.Label>
-                </Form.Group>
-                <Form.Group
-                  className="form-group mb-3"
-                  as={Col}
-                  controlId="topicDescription"
-                >
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    value={content}
-                    disabled={isLoading}
-                    placeholder="Enter topic content..."
-                    onChange={(e) => setContent(e.target.value)}
-                  />
-                  <Form.Label>Topic Content</Form.Label>
-                </Form.Group>
-                <Form.Group className="form-group select2-container mb-3">
-                  <Select
-                    classNamePrefix="form-control"
-                    placeholder="Choose Topic's Space..."
-                    title="space"
-                    options={options}
-                    isDisabled={isLoading}
-                    value={options.filter((obj) => obj.value === selectedSpace)}
-                    onChange={(e) => setSelectedSpace(e.value)}
-                  />
-                  <Form.Label className="control-label">Topic Space</Form.Label>
-                </Form.Group>
-                <Form.Group className="form-group select2-container mb-3">
-                  <CreatableSelect
-                    components={{
-                      Menu: () => null,
-                      DropdownIndicator: () => null,
-                      IndicatorSeparator: () => null,
-                    }}
-                    placeholder="Enter Topic Tags..."
-                    isMulti
-                    isDisabled={isLoading}
-                    value={selectedTags}
-                    onChange={(e) => setSelectedTags(e)}
-                  />
-                  <Form.Label className="control-label">Topic Tags</Form.Label>
-                </Form.Group>
-                <Button
-                  disabled={isLoading}
-                  className="mb-4 w-100"
-                  type="submit"
-                >
-                  {isLoading ? "Adding Topic..." : "Add Topic"}
-                </Button>
-              </Form>
-            </section>
-          </Col>
-        </Row>
-      </Container>
-    </main>
+      <main>
+        <Container>
+          <Row className="new-topic align-items-center justify-content-center">
+            <Col lg={8}>
+              <section className="new-topic-form">
+                {isLoading && <div className="loader"></div>}
+                <h5 className="section-title">Add New Topic</h5>
+                {message && (
+                    <div
+                        className={`message ${isError ? "error" : ""} ${
+                            isSuccess ? "success" : ""
+                        } ${isLoading ? "info" : ""}`}
+                    >
+                      {`${message} `}
+                      {newTopicURL && (
+                          <Link to={newTopicURL}>Click here to preview it.</Link>
+                      )}
+                    </div>
+                )}
+                <Form className="floating" onSubmit={handleSubmit}>
+                  <Form.Group
+                      className="form-group mb-3"
+                      as={Col}
+                      controlId="topicTitle"
+                  >
+                    <Form.Control
+                        type="text"
+                        name="title"
+                        value={title}
+                        disabled={isLoading}
+                        placeholder="Enter topic title..."
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                    <Form.Label>Topic Title</Form.Label>
+                  </Form.Group>
+                  <Form.Group
+                      className="form-group mb-3"
+                      as={Col}
+                      controlId="topicDescription"
+                  >
+                    <Form.Control
+                        as="textarea"
+                        rows={3}
+                        value={content}
+                        disabled={isLoading}
+                        placeholder="Enter topic content..."
+                        onChange={(e) => setContent(e.target.value)}
+                    />
+                    <Form.Label>Topic Content</Form.Label>
+                  </Form.Group>
+                  <Form.Group className="form-group select2-container mb-3">
+                    <Select
+                        classNamePrefix="form-control"
+                        placeholder="Choose Topic's Space..."
+                        title="space"
+                        options={options}
+                        isDisabled={isLoading}
+                        value={options.find((obj) => obj.value === selectedSpace)} // Use .find() for better performance than .filter()
+                        onChange={(e) => setSelectedSpace(e.value)}
+                    />
+                    <Form.Label className="control-label">Topic Space</Form.Label>
+                  </Form.Group>
+                  <Form.Group className="form-group select2-container mb-3">
+                    <CreatableSelect
+                        components={{
+                          Menu: () => null,
+                          DropdownIndicator: () => null,
+                          IndicatorSeparator: () => null,
+                        }}
+                        placeholder="Enter Topic Tags..."
+                        isMulti
+                        isDisabled={isLoading}
+                        value={selectedTags}
+                        onChange={(e) => setSelectedTags(e)}
+                    />
+                    <Form.Label className="control-label">Topic Tags</Form.Label>
+                  </Form.Group>
+                  <Button
+                      disabled={isLoading}
+                      className="mb-4 w-100"
+                      type="submit"
+                  >
+                    {isLoading ? "Adding Topic..." : "Add Topic"}
+                  </Button>
+                </Form>
+              </section>
+            </Col>
+          </Row>
+        </Container>
+      </main>
   );
 };
 

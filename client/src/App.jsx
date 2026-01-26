@@ -25,44 +25,48 @@ import NotFound from "./pages/NotFound";
 import "react-loading-skeleton/dist/skeleton.css";
 import "./App.css";
 import "./Responsive.css";
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
 const App = () => {
-  let isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+  // We keep the useSelector to ensure the component re-renders when Redux auth state changes
   const { isLoggedIn } = useSelector((state) => state.auth);
 
-  return useMemo(() => {
-    return (
+  // Calculate auth state on every render
+  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+
+  return (
       <Router>
         <Header />
         <Routes>
+          {/* Note: In React Router v6, specific routes take precedence,
+            but usually the catch-all "*" goes at the very bottom.
+            I left your structure as-is to preserve your logic. */}
           <Route path="*" element={<NotFound />} />
           <Route
-            path="/register"
-            element={isAuth ? <Navigate replace to="/" /> : <Register />}
+              path="/register"
+              element={isAuth ? <Navigate replace to="/" /> : <Register />}
           />
           <Route
-            path="/login"
-            element={isAuth ? <Navigate replace to="/" /> : <Login />}
+              path="/login"
+              element={isAuth ? <Navigate replace to="/" /> : <Login />}
           />
           <Route
-            path="/verify-email"
-            element={isAuth ? <Navigate replace to="/" /> : <EmailVerify />}
+              path="/verify-email"
+              element={isAuth ? <Navigate replace to="/" /> : <EmailVerify />}
           />
           <Route
-            path="/forgot-password"
-            element={isAuth ? <Navigate replace to="/" /> : <ForgotPassword />}
+              path="/forgot-password"
+              element={isAuth ? <Navigate replace to="/" /> : <ForgotPassword />}
           />
           <Route
-            path="/reset-password"
-            element={isAuth ? <Navigate replace to="/" /> : <ResetPassword />}
+              path="/reset-password"
+              element={isAuth ? <Navigate replace to="/" /> : <ResetPassword />}
           />
           <Route index element={<Home />} />
           <Route path="/topics/:id/:slug" element={<Topic />} />
           <Route
-            path="/topic/new"
-            element={!isAuth ? <Navigate replace to="/login" /> : <NewTopic />}
+              path="/topic/new"
+              element={!isAuth ? <Navigate replace to="/login" /> : <NewTopic />}
           />
           <Route path="/user/:username" element={<Profile />}>
             <Route path="topics" element={<TopicsTab />} />
@@ -72,16 +76,14 @@ const App = () => {
             <Route path="followers" element={<FollowersTab />} />
           </Route>
           <Route
-            path="/user/:username/edit"
-            element={
-              !isAuth ? <Navigate replace to="/login" /> : <EditProfile />
-            }
+              path="/user/:username/edit"
+              element={
+                !isAuth ? <Navigate replace to="/login" /> : <EditProfile />
+              }
           />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
-    );
-    // eslint-disable-next-line
-  }, [isLoggedIn]);
+  );
 };
 export default App;

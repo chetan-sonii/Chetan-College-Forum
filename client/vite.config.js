@@ -3,13 +3,13 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(() => {
     return {
-        plugins: [react()],
+        build: {
+            outDir: 'build',
+        },
         server: {
-            port: 3000, // Keep port 3000 to match your Server's CORS config
+            port: 3000, // <--- Add this to match your Server's expected origin
             open: true,
         },
-        build: {
-            outDir: 'build', // Keeps the output folder name consistent with CRA
-        },
+        plugins: [react()],
     };
 });
