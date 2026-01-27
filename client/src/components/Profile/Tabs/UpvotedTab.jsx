@@ -19,31 +19,21 @@ const UpvotedTab = () => {
   }, [dispatch]);
 
   topics = topics.filter((t) => t.upvotes.includes(username));
-
-  return useMemo(() => {
-    return (
-      <>
-        <Row className="profile-info">
-          <Col>
-            <div className="tab-ui">
-              <h6 className="tab-title">Upvoted Topics</h6>
-              <Row>
-                {getAllTopicsIsLoading && (
-                  <>
-                    <SkeletonTopicItem />
-                  </>
-                )}
-                {!getAllTopicsIsLoading &&
-                  topics.length > 0 &&
-                  topics.map((topic) => (
-                    <TopicItem key={topic._id} topic={topic} />
-                  ))}
-              </Row>
+  return (
+      <Row className="profile-info">
+        <Col>
+          <div className="tab-ui">
+            <h6 className="tab-title">Upvoted Topics</h6>
+            <div className="feed">
+              <p className="text-muted p-3">Upvoted topics feature coming soon.</p>
+              {/* Add your mapping logic here once the backend/redux is ready:
+                {upvotedTopics?.map(topic => <TopicItem key={topic._id} topic={topic} />)}
+             */}
             </div>
-          </Col>
-        </Row>
-      </>
-    );
-  }, [topics, getAllTopicsIsLoading]);
+          </div>
+        </Col>
+      </Row>
+  );
 };
+
 export default UpvotedTab;

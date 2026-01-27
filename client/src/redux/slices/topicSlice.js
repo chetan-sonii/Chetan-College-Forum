@@ -28,11 +28,13 @@ const initialState = {
 
 export const getAllTopics = createAsyncThunk(
     "topic/getAllTopics",
-    async ({ sortOption, searchQuery }, { rejectWithValue }) => {
+    // Accept an object containing search, sort, AND space
+    async ({ search = "", sort = "latest", space = "" }, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get("/api/topics", {
-                params: { sort: sortOption, search: searchQuery },
-            });
+            // Pass space to the API URL
+            const { data } = await axios.get(
+                `/api/topics?search=${search}&sort=${sort}&space=${space}`
+            );
             return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
@@ -204,6 +206,20 @@ const topicSlice = createSlice({
                 state.addTopic.message = action.payload.message;
             })
 
+            //  handle getusertopics
+
+            .addCase(getUserTopics.pending, (state) => {
+                state.getAllTopicsIsLoading = true;
+            })
+            .addCase(getUserTopics.fulfilled, (state, action) => {
+                state.getAllTopicsIsLoading = false;
+                state.topics = action.payload; // Updates the main topics list
+            })
+            .addCase(getUserTopics.rejected, (state) => {
+                state.getAllTopicsIsLoading = false;
+            })
+
+
             // TOGGLE UPVOTE
             .addCase(toggleUpvoteTopic.pending, (state) => {
                 state.votingIsLoading = true;
@@ -329,7 +345,17 @@ const topicSlice = createSlice({
             });
     },
 });
-
+export const getUserTopics = createAsyncThunk(
+    "topic/getUserTopics",
+    async (username, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(`/api/user/${username}/topics`);
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
 export const { resetTopics, resetNewTopic, setSearchQuery, setSortOption } =
     topicSlice.actions;
 

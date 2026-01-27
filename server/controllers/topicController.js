@@ -6,7 +6,8 @@ const Space = require("../models/spaceModel");
 module.exports = {
   getAllTopics: async (req, res) => {
     try {
-      const { search, sort } = req.query;
+      // 1. Accept 'space' from query parameters
+      const { search, sort, space } = req.query;
       let sortOptions = {};
       let searchQuery = {};
 
@@ -14,6 +15,12 @@ module.exports = {
         searchQuery = { title: new RegExp(search, "i") };
       }
 
+      // 2. Add Space Filter
+      if (space && space !== "undefined" && space !== "null") {
+        searchQuery.space = space;
+      }
+
+      // ... (Rest of sort logic remains the same) ...
       if (sort === "latest") {
         sortOptions = { createdAt: -1 };
       }
@@ -26,12 +33,13 @@ module.exports = {
       if (sort === "most_upvoted") {
         sortOptions = { upvotes: -1 };
       }
+
       let topics = await Topic.find(searchQuery)
-        .sort(sortOptions)
-        .populate("tags")
-        .populate({ path: "author", select: { password: 0, __v: 0 } })
-        .lean()
-        .exec();
+          .sort(sortOptions)
+          .populate("tags")
+          .populate({ path: "author", select: { password: 0, __v: 0 } })
+          .lean()
+          .exec();
       return res.json(topics);
     } catch (err) {
       console.log(err.message);

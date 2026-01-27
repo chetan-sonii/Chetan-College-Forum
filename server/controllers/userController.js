@@ -18,7 +18,21 @@ module.exports = {
       return res.status(500).json({ message: err.message });
     }
   },
-
+  getUserTopics: async (req, res) => {
+    const { username } = req.params;
+    try {
+      const topics = await Topic.find({ owner: username })
+          .populate("tags")
+          .populate({ path: "author", select: { password: 0, __v: 0 } })
+          .sort({ createdAt: -1 })
+          .lean()
+          .exec();
+      return res.status(200).json(topics);
+    } catch (err) {
+      console.log(err.message);
+      return res.status(500).json({ message: err.message });
+    }
+  },
   getUserComments: async (req, res) => {
     const { username } = req.params;
     try {

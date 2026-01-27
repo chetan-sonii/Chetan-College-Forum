@@ -38,9 +38,7 @@ const App = () => {
       <Router>
         <Header />
         <Routes>
-          {/* Note: In React Router v6, specific routes take precedence,
-            but usually the catch-all "*" goes at the very bottom.
-            I left your structure as-is to preserve your logic. */}
+
           <Route path="*" element={<NotFound />} />
           <Route
               path="/register"
@@ -62,7 +60,8 @@ const App = () => {
               path="/reset-password"
               element={isAuth ? <Navigate replace to="/" /> : <ResetPassword />}
           />
-          <Route index element={<Home />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/space/:space" element={<Home />} />
           <Route path="/topics/:id/:slug" element={<Topic />} />
           <Route
               path="/topic/new"
