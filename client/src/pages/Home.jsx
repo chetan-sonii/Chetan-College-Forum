@@ -7,20 +7,23 @@ import { resetUserProfile } from "../redux/slices/profileSlice";
 import RightSidebar from "../components/RightSidebar/RightSidebar";
 import LeftSidebar from "../components/LeftSidebar/LeftSidebar";
 import SkeletonTopicItem from "../components/Skeletons/SkeletonTopicItem";
+import {useParams} from "react-router-dom";
 
 const Home = () => {
   const dispatch = useDispatch();
+  const { space } = useParams(); // ✅ Get space from URL
   const { topics, getAllTopicsIsLoading } = useSelector((state) => state.topic);
   const { sortOption, searchQuery } = useSelector((state) => state.topic);
 
   useEffect(() => {
-    document.title = "Home | CHETAN Forum";
-  }, []);
+    document.title = space ? `${space} Space | CHETAN Forum` : "Home | CHETAN Forum";
+  }, [space]);
 
   useEffect(() => {
     dispatch(resetUserProfile());
-    dispatch(getAllTopics({ sortOption, searchQuery }));
-  }, [dispatch, sortOption, searchQuery]);
+    // ✅ Pass 'space' to the action
+    dispatch(getAllTopics({ sortOption, searchQuery, space }));
+  }, [dispatch, sortOption, searchQuery, space]); // ✅ Re-run when 'space' changes
 
   return (
       <>
@@ -30,6 +33,7 @@ const Home = () => {
               <LeftSidebar />
               <Col lg={6} className="main-content">
                 <div className="filter">
+                  {space && <h4 className="mb-3 text-capitalize">Space: {space}</h4>}
                   <Form.Select
                       name="topicsSort"
                       className="custom-select"
