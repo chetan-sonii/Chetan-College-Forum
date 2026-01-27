@@ -7,11 +7,11 @@ import { resetUserProfile } from "../redux/slices/profileSlice";
 import RightSidebar from "../components/RightSidebar/RightSidebar";
 import LeftSidebar from "../components/LeftSidebar/LeftSidebar";
 import SkeletonTopicItem from "../components/Skeletons/SkeletonTopicItem";
-import {useParams} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { space } = useParams(); // ✅ Get space from URL
+  const { space } = useParams();
   const { topics, getAllTopicsIsLoading } = useSelector((state) => state.topic);
   const { sortOption, searchQuery } = useSelector((state) => state.topic);
 
@@ -21,16 +21,20 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(resetUserProfile());
-    // ✅ Pass 'space' to the action
     dispatch(getAllTopics({ sortOption, searchQuery, space }));
-  }, [dispatch, sortOption, searchQuery, space]); // ✅ Re-run when 'space' changes
+  }, [dispatch, sortOption, searchQuery, space]);
 
   return (
       <>
         <main>
           <Container>
             <Row>
-              <LeftSidebar />
+              {/* ✅ FIX: Wrap LeftSidebar in Col lg={3} */}
+              <Col lg={3} className="d-none d-lg-block">
+                <LeftSidebar />
+              </Col>
+
+              {/* Middle Content - lg={6} */}
               <Col lg={6} className="main-content">
                 <div className="filter">
                   {space && <h4 className="mb-3 text-capitalize">Space: {space}</h4>}
@@ -38,7 +42,7 @@ const Home = () => {
                       name="topicsSort"
                       className="custom-select"
                       onChange={(e) => dispatch(setSortOption(e.target.value))}
-                      value={sortOption} // Controlled component best practice
+                      value={sortOption}
                   >
                     <option value="latest">Latest topics</option>
                     <option value="popular">Most popular topics</option>
@@ -54,13 +58,19 @@ const Home = () => {
                       </>
                   ) : (
                       topics?.map((topic) => (
-                          // Use unique ID instead of index for better rendering performance
                           <TopicItem key={topic._id} topic={topic} />
                       ))
                   )}
+                  {!getAllTopicsIsLoading && topics?.length === 0 && (
+                      <p className="text-muted text-center mt-5">No topics found in this space.</p>
+                  )}
                 </div>
               </Col>
-              <RightSidebar />
+
+              {/* ✅ FIX: Wrap RightSidebar in Col lg={3} */}
+              <Col lg={3} className="d-none d-lg-block">
+                <RightSidebar />
+              </Col>
             </Row>
           </Container>
         </main>
