@@ -29,15 +29,17 @@ const Home = () => {
         <main>
           <Container>
             <Row>
-              {/* ✅ FIX: Wrap LeftSidebar in Col lg={3} */}
+              {/* ✅ FIX 1: Wrap LeftSidebar in Col (3 units wide) */}
+              {/* d-none d-lg-block hides it on mobile/tablet */}
               <Col lg={3} className="d-none d-lg-block">
                 <LeftSidebar />
               </Col>
 
-              {/* Middle Content - lg={6} */}
+              {/* Middle Content (6 units wide) */}
               <Col lg={6} className="main-content">
                 <div className="filter">
                   {space && <h4 className="mb-3 text-capitalize">Space: {space}</h4>}
+
                   <Form.Select
                       name="topicsSort"
                       className="custom-select"
@@ -50,6 +52,7 @@ const Home = () => {
                     <option value="most_upvoted">Most upvoted topics</option>
                   </Form.Select>
                 </div>
+
                 <div className="topics">
                   {getAllTopicsIsLoading ? (
                       <>
@@ -67,7 +70,7 @@ const Home = () => {
                 </div>
               </Col>
 
-              {/* ✅ FIX: Wrap RightSidebar in Col lg={3} */}
+              {/* ✅ FIX 2: Wrap RightSidebar in Col (3 units wide) */}
               <Col lg={3} className="d-none d-lg-block">
                 <RightSidebar />
               </Col>
