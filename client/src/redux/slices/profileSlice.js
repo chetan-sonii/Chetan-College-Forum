@@ -128,6 +128,7 @@ const profileSlice = createSlice({
   },
 });
 
+
 export const { resetUserProfile, resetUserComments } = profileSlice.actions;
 
 export default profileSlice.reducer;

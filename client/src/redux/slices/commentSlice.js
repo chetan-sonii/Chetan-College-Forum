@@ -126,11 +126,18 @@ const commentSlice = createSlice({
             })
             .addCase(addComment.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.comments.push(action.payload.comment);
+                // ✅ FIX: Check for duplicate before pushing
+                const exists = state.comments.find(
+                    (c) => c._id === action.payload.comment._id
+                );
+                if (!exists) {
+                    state.comments.push(action.payload.comment);
+                }
             })
             .addCase(addComment.rejected, (state) => {
                 state.isLoading = false;
             })
+
             .addCase(toggleUpvoteComment.pending, (state) => {
                 state.votingIsLoading = true;
             })
