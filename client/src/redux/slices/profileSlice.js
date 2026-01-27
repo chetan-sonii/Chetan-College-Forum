@@ -11,16 +11,29 @@ const initialState = {
   followIsLoading: false,
 };
 
+// ✅ DEFINE THE THUNK HERE
+export const toggleUserFollow = createAsyncThunk(
+    "profile/toggleUserFollow",
+    async (username, { rejectWithValue }) => {
+        try {
+            // The backend returns the UPDATED CURRENT USER (me)
+            const { data } = await axios.put(`/api/user/${username}/follow`);
+            return { updatedCurrentUser: data, followedUsername: username };
+        } catch (err) {
+            return rejectWithValue(err.response?.data || { message: err.message });
+        }
+    }
+);
+
 export const getUserProfile = createAsyncThunk(
     "profile/getUserProfile",
     async (username, { rejectWithValue }) => {
-      try {
-        const { data } = await axios.get(`/api/user/${username}`);
-        return data;
-      } catch (err) {
-        console.log(err.message);
-        return rejectWithValue(err.message);
-      }
+        try {
+            const { data } = await axios.get(`/api/user/${username}`);
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
     }
 );
 
@@ -89,6 +102,21 @@ const profileSlice = createSlice({
         .addCase(getUserProfile.rejected, (state) => {
           state.profileIsLoading = false;
         })
+        .addCase(toggleUserFollow.fulfilled, (state, action) => {
+            // If we are viewing the profile of the person we just followed/unfollowed
+            if (state.user && state.user.username === action.payload.followedUsername) {
+                const myId = action.payload.updatedCurrentUser._id;
+                const isFollowing = action.payload.updatedCurrentUser.following.includes(state.user._id);
+
+                if (isFollowing) {
+                    // Add me to their followers list
+                    state.user.followers.push(myId);
+                } else {
+                    // Remove me from their followers list
+                    state.user.followers = state.user.followers.filter(id => id !== myId);
+                }
+            }
+        })
 
         // GET COMMENTS
         .addCase(getUserComments.pending, (state) => {
@@ -124,7 +152,8 @@ const profileSlice = createSlice({
         })
         .addCase(getUserFollowers.rejected, (state) => {
           state.followIsLoading = false;
-        });
+        })
+
   },
 });
 

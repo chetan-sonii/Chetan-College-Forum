@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../utils/axios";
+import { toggleUserFollow } from "./profileSlice"
 
 const initialState = {
-    user: {},
+    user: null,
     token: null,
     isHeaderLoading: true,
     isLoggedIn: false,
@@ -129,17 +130,7 @@ export const updateUserProfile = createAsyncThunk(
     }
 );
 
-export const toggleUserFollow = createAsyncThunk(
-    "auth/toggleUserFollow",
-    async (username, { rejectWithValue }) => {
-        try {
-            const { data } = await axios.put(`/api/user/${username}/follow`, username);
-            return data;
-        } catch (err) {
-            return rejectWithValue(safeReject(err));
-        }
-    }
-);
+
 
 export const sendEmailVerification = createAsyncThunk(
     "auth/sendEmailVerification",
@@ -316,13 +307,9 @@ const authSlice = createSlice({
                 state.isLoading = true;
             })
             .addCase(toggleUserFollow.fulfilled, (state, action) => {
-                if (state.user) {
-                    state.user = action.payload;
-                    // Update localStorage to keep it in sync
-                    localStorage.setItem("user", JSON.stringify(action.payload));
-                }
-                state.isLoading = false;
-                state.user = action.payload ?? state.user;
+                // Update the logged-in user with the fresh data from backend
+                state.user = action.payload.updatedCurrentUser;
+                localStorage.setItem("user", JSON.stringify(action.payload.updatedCurrentUser));
             })
             .addCase(toggleUserFollow.rejected, (state) => {
                 state.isLoading = false;
