@@ -20,5 +20,5 @@ router.post(
   topicController.toggleDownvoteTopic
 );
 router.delete("/:id", validateAccessToken, topicController.deleteTopic);
-
+router.post("/:id/poll/vote", validateAccessToken, topicController.voteOnPoll);
 module.exports = router;

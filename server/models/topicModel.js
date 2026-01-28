@@ -1,57 +1,32 @@
 const mongoose = require("mongoose");
 
-// ❌ REMOVED: const AutoIncrement = require("mongoose-sequence")(mongoose);
-
-const TopicSchema = new mongoose.Schema(
+const topicSchema = new mongoose.Schema(
     {
-        owner: String,
-        title: String,
-        content: String,
-        slug: String,
-        space: String, // ✅ ADDED: This is required for your controller to work
-        upvotes: [
-            {
-                type: String,
-                ref: "User",
-                default: [],
-            },
-        ],
-        downvotes: [
-            {
-                type: String,
-                ref: "User",
-                default: [],
-            },
-        ],
-        viewsCount: {
-            type: Number,
-            default: 0,
+        owner: { type: String, required: true },
+        title: { type: String, required: true },
+        slug: { type: String, required: true },
+        content: { type: String, required: true },
+        space: { type: String }, // Assuming you added this from previous steps
+        tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
+        viewsCount: { type: Number, default: 0 },
+        upvotes: [{ type: String }],
+        downvotes: [{ type: String }],
+        author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+
+        // ✅ NEW POLL SCHEMA
+        poll: {
+            question: { type: String },
+            options: [
+                {
+                    text: String,
+                    votes: { type: Number, default: 0 },
+                },
+            ],
+            voters: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Tracks who voted
+            expiresAt: { type: Date }, // When the poll ends
         },
-        totalComments: {
-            type: Number,
-            default: 0,
-        },
-        tags: [
-            {
-                type: mongoose.Types.ObjectId,
-                ref: "Tag",
-                default: [],
-            },
-        ],
     },
     { timestamps: true }
 );
 
-// ❌ REMOVED: TopicSchema.plugin(AutoIncrement, { inc_field: "TopicID" });
-
-TopicSchema.virtual("author", {
-    ref: "User",
-    localField: "owner",
-    foreignField: "username",
-    justOne: true,
-});
-
-TopicSchema.set("toObject", { virtuals: true });
-TopicSchema.set("toJSON", { virtuals: true });
-
-module.exports = mongoose.model("Topic", TopicSchema);
+module.exports = mongoose.model("Topic", topicSchema);

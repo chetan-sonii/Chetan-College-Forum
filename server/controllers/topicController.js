@@ -81,12 +81,12 @@ module.exports = {
       console.log(err.message);
     }
   },
+// ✅ UPDATED addTopic
   addTopic: async (req, res) => {
     try {
-      const { title, content, selectedSpace, selectedTags } = req.body;
+      const { title, content, selectedSpace, selectedTags, poll } = req.body;
 
       let createdTags = [];
-
       for (let index = 0; index < selectedTags.length; index++) {
         let name = selectedTags[index].value;
         let tagFound = await Tag.findOne({ name });
@@ -112,15 +112,35 @@ module.exports = {
           .replace(/\-\-+/g, "-")
           .replace(/\-$/g, "");
 
+      // Handle Poll Data
+      let pollData = null;
+      if (poll && poll.question && poll.options.length >= 2) {
+        let expiresAt = null;
+        if (poll.duration > 0) {
+          expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + parseInt(poll.duration));
+        }
+
+        pollData = {
+          question: poll.question,
+          options: poll.options.map(opt => ({ text: opt, votes: 0 })),
+          voters: [],
+          expiresAt: expiresAt
+        };
+      }
+
       let topic = await Topic.create({
         owner: req.user.username,
         title: title.trim(),
         content: content.trim(),
         slug: slug.trim(),
         tags: createdTags,
-        space: selectedSpace, // <--- CRITICAL FIX: Saving the space
+        space: selectedSpace,
+        poll: pollData,
+        author: req.user._id // ✅ FIX: Save the Author ID
       });
 
+      // Populate author immediately so the frontend receives it
       topic = await topic.populate({
         path: "author",
         select: { password: 0, __v: 0 },
@@ -136,6 +156,45 @@ module.exports = {
       });
     }
   },
+
+  // ✅ NEW: Vote Function
+  voteOnPoll: async (req, res) => {
+    const { id } = req.params;
+    const { optionIndex } = req.body;
+    const userId = req.user._id;
+
+    try {
+      const topic = await Topic.findById(id);
+      if (!topic || !topic.poll) {
+        return res.status(404).json({ message: "Poll not found" });
+      }
+
+      if (topic.poll.expiresAt && new Date() > new Date(topic.poll.expiresAt)) {
+        return res.status(400).json({ message: "Poll has expired" });
+      }
+
+      // Check using String comparison for ObjectIds
+      if (topic.poll.voters.some(v => v.toString() === userId.toString())) {
+        return res.status(400).json({ message: "You have already voted" });
+      }
+
+      topic.poll.options[optionIndex].votes += 1;
+      topic.poll.voters.push(userId);
+
+      await topic.save();
+
+      return res.status(200).json({
+        poll: topic.poll,
+        topicId: id,
+        message: "Vote registered!"
+      });
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
+
+
   deleteTopic: async (req, res) => {
     try {
       const { id } = req.params;

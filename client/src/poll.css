@@ -1,0 +1,201 @@
+/* -------- CreatePoll refined styles -------- */
+.createpoll-card {
+    max-width: 880px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: visible;
+    z-index: 5;
+    box-shadow: 0 8px 30px rgba(22,45,66,0.06);
+}
+
+/* header */
+.createpoll-header { color: #0b69ff; }
+.createpoll-title { font-size: 1.05rem; letter-spacing: 0.2px; }
+
+/* Group label & help */
+.createpoll-field-label {
+    display: block;
+    font-size: 0.69rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.9px;
+    margin-bottom: 8px;
+    margin-top: 2px;
+}
+.createpoll-help {
+    display: block;
+    margin-top: 8px;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+/* Question input */
+.createpoll-question {
+    font-size: 1rem;
+    padding: 12px 14px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    border-radius: 8px;
+    line-height: 1.4;
+    box-shadow: none;
+    margin-bottom: 4px;
+}
+
+/* Options list */
+.createpoll-options { gap: 12px; }
+.createpoll-option-row {
+    gap: 12px;
+    margin-bottom: 6px;
+    width: 100%;
+    align-items: center;
+}
+
+/* index badge */
+.createpoll-index {
+    min-width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #f3f6ff 0%, #ffffff 100%);
+    border: 1px solid rgba(11,105,255,0.08);
+    color: #0b69ff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex: 0 0 40px;
+}
+
+/* option input */
+.createpoll-option-input {
+    border-radius: 8px;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    flex: 1 1 auto;
+    min-width: 180px;
+}
+
+/* remove button */
+.createpoll-remove-btn {
+    color: #e05050;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    text-decoration: none;
+    background: transparent;
+    border: none;
+}
+
+/* add option button — visible text & good contrast */
+.createpoll-add-btn {
+    background: linear-gradient(180deg,#2b6ef6 0%, #1b4dd6 100%);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(40, 63, 255, 0.09);
+}
+.createpoll-add-btn svg { margin-right: 6px; fill: currentColor; }
+
+/* duration control (right side) */
+.createpoll-duration {
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.04);
+    align-items: center;
+    gap: 10px;
+}
+.createpoll-duration svg { color: #6b7280; }
+
+.createpoll-select {
+    min-width: 90px;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    padding-left: 6px;
+}
+
+/* small responsive tweaks */
+@media (max-width: 576px) {
+    .createpoll-duration { margin-top: 6px; justify-content: flex-start; }
+    .createpoll-index { min-width: 34px; height: 34px; font-size: 0.9rem; }
+    .createpoll-option-input { min-width: 140px; padding: 9px; }
+}
+
+
+
+/* === CreatePoll: strong overrides to prevent overlapping ===
+   Append this after the previous createpoll styles. These rules
+   intentionally override floating/global form rules so labels
+   don't drift into the header. */
+.createpoll-card { position: relative; }
+
+/* Make the header reliably sit on top */
+.createpoll-header {
+    position: relative;
+    z-index: 20; /* keep header above anything else */
+}
+
+/* Ensure title/icon sit inline and don't shift */
+.createpoll-title { margin-left: 6px; position: relative; z-index: 21; }
+
+/* Force labels/input to normal flow (undo form-floating style) */
+.createpoll-card .createpoll-field-label,
+.createpoll-card .form-label,
+.createpoll-card label {
+    position: static !important;
+    display: block !important;
+    margin: 0.5rem 0 0.5rem 0 !important;
+    z-index: 1 !important;
+    transform: none !important;
+    top: auto !important;
+    left: auto !important;
+}
+
+/* Protect help text too */
+.createpoll-card .createpoll-help,
+.createpoll-card .form-text {
+    position: static !important;
+    margin-top: 0.5rem !important;
+    z-index: 1 !important;
+}
+
+/* Give the header breathing room so nothing sits on top of it */
+.createpoll-card .card-body {
+    padding-top: calc(1rem + 0.25rem); /* keeps header separate from labels */
+}
+
+/* Slightly push the question input down so label and input never overlap the header */
+.createpoll-question {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+/* Defensive: ensure option rows can't overlap header or label */
+.createpoll-options,
+.createpoll-option-row {
+    position: relative;
+    z-index: 1;
+}
+
+/* If some global CSS shrinks line-height, ensure readability */
+.createpoll-field-label,
+.createpoll-help,
+.createpoll-title,
+.createpoll-index,
+.createpoll-option-input,
+.createpoll-question {
+    line-height: 1.25;
+}
+
+/* Small screens: keep spacing consistent */
+@media (max-width: 576px) {
+    .createpoll-card .card-body { padding-top: 1rem; }
+    .createpoll-field-label { margin-top: 0.45rem !important; }
+}

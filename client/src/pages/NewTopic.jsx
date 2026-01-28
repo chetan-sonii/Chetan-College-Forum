@@ -5,9 +5,16 @@ import CreatableSelect from "react-select/creatable";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { addTopic, resetNewTopic, getSpaces } from "../redux/slices/topicSlice";
+import CreatePoll from "../components/Topic/Poll/CreatePoll"; // ✅ Import Poll Component
+import { BsBarChartFill } from "react-icons/bs";
 
 const NewTopic = () => {
   const dispatch = useDispatch();
+
+  // ✅ Poll State
+  const [showPoll, setShowPoll] = useState(false);
+  const [pollData, setPollData] = useState(null);
+
   const { message, isLoading, isSuccess, isError, newTopicURL } = useSelector(
       (state) => state.topic.addTopic
   );
@@ -23,7 +30,6 @@ const NewTopic = () => {
     dispatch(getSpaces());
   }, [dispatch]);
 
-  // Clean Refactor: Use map instead of forEach/push
   const options = spaces?.map((space) => ({
     value: space.name,
     label: space.name,
@@ -31,7 +37,9 @@ const NewTopic = () => {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [selectedSpace, setSelectedSpace] = useState("Android");
+
+  // ✅ FIX: Initialize as null, store full object
+  const [selectedSpace, setSelectedSpace] = useState(null);
   const [selectedTags, setSelectedTags] = useState([]);
 
   const handleSubmit = async (e) => {
@@ -40,8 +48,15 @@ const NewTopic = () => {
     if (!content || content?.trim()?.length === 0) return;
     if (!selectedSpace) return;
     if (!selectedTags || selectedTags.length === 0) return;
+
     try {
-      dispatch(addTopic({ title, content, selectedSpace, selectedTags }));
+      dispatch(addTopic({
+        title,
+        content,
+        selectedSpace: selectedSpace.value, // ✅ Now works because selectedSpace is an object
+        selectedTags,
+        poll: showPoll ? pollData : null // ✅ Send Poll Data
+      }));
     } catch (err) {
       console.log(err.message);
     }
@@ -98,6 +113,7 @@ const NewTopic = () => {
                     />
                     <Form.Label>Topic Content</Form.Label>
                   </Form.Group>
+
                   <Form.Group className="form-group select2-container mb-3">
                     <Select
                         classNamePrefix="form-control"
@@ -105,11 +121,13 @@ const NewTopic = () => {
                         title="space"
                         options={options}
                         isDisabled={isLoading}
-                        value={options.find((obj) => obj.value === selectedSpace)} // Use .find() for better performance than .filter()
-                        onChange={(e) => setSelectedSpace(e.value)}
+                        // ✅ FIX: Bind directly to the object state
+                        value={selectedSpace}
+                        onChange={(e) => setSelectedSpace(e)}
                     />
                     <Form.Label className="control-label">Topic Space</Form.Label>
                   </Form.Group>
+
                   <Form.Group className="form-group select2-container mb-3">
                     <CreatableSelect
                         components={{
@@ -125,6 +143,22 @@ const NewTopic = () => {
                     />
                     <Form.Label className="control-label">Topic Tags</Form.Label>
                   </Form.Group>
+
+                  {/* ✅ Poll Button */}
+                  <div className="mb-3">
+                    <Button
+                        variant={showPoll ? "danger" : "primary"}
+                        size="sm"
+                        onClick={() => setShowPoll(!showPoll)}
+                        className="d-flex align-items-center gap-2 text-white" // Added text-white
+                    >
+                      <BsBarChartFill /> {showPoll ? "Remove Poll" : "Add Poll"}
+                    </Button>
+                  </div>
+
+                  {/* ✅ Poll Component */}
+                  {showPoll && <CreatePoll onPollChange={setPollData} />}
+
                   <Button
                       disabled={isLoading}
                       className="mb-4 w-100"

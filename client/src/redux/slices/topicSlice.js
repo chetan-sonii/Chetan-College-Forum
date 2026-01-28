@@ -82,6 +82,25 @@ export const addTopic = createAsyncThunk(
     }
 );
 
+
+
+export const voteOnPoll = createAsyncThunk(
+    "topic/voteOnPoll",
+    async ({ topicId, optionIndex }, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.post(`/api/topics/${topicId}/poll/vote`, {
+                optionIndex,
+            });
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
+
+
+
+
 export const deleteTopic = createAsyncThunk(
     "topic/deleteTopic",
     async (id, { rejectWithValue }) => {
@@ -215,6 +234,20 @@ const topicSlice = createSlice({
                 state.addTopic.isSuccess = false;
                 state.addTopic.isError = true;
                 state.addTopic.message = action.payload.message;
+            })
+
+
+
+            .addCase(voteOnPoll.fulfilled, (state, action) => {
+                // Find the topic in the list and update its poll data instantly
+                const index = state.topics.findIndex(t => t._id === action.payload.topicId);
+                if (index !== -1) {
+                    state.topics[index].poll = action.payload.poll;
+                }
+                // Also update the single view topic if active
+                if (state.topic?._id === action.payload.topicId) {
+                    state.topic.poll = action.payload.poll;
+                }
             })
 
             //  handle getusertopics

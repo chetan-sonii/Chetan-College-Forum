@@ -10,6 +10,8 @@ import {
 } from "../../redux/slices/topicSlice";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
+import PollItem from "./Poll/PollItem";
+
 // making some changes..........
 const TopicItem = ({ topic }) => {
   const dispatch = useDispatch();
@@ -78,6 +80,9 @@ const TopicItem = ({ topic }) => {
                 <h4 className="topic-title">{topic?.title}</h4>
             </Link>
           <p className="topic-summary">{topic?.content}</p>
+            {topic.poll && topic.poll.question && (
+                <PollItem poll={topic.poll} topicId={topic._id} />
+            )}
           <div className="topic-meta d-flex align-items-center">
             <div className="topic-writer d-flex align-items-center">
               <Link
