@@ -82,7 +82,6 @@ const Home = () => {
                       <p className="text-muted text-center mt-5">No topics found in this space.</p>
                   )}
                 </div>
-                {/* ✅ ADD PAGINATION HERE */}
                 {!getAllTopicsIsLoading && topics?.length > 0 && (
                     <Pagination
                         currentPage={currentPage}

@@ -31,7 +31,7 @@ const initialState = {
 export const getAllTopics = createAsyncThunk(
     "topic/getAllTopics",
     // Accept object with space
-    async ({ sortOption, searchQuery, space }, { rejectWithValue }) => {
+    async ({ sortOption, searchQuery, space, page }, { rejectWithValue }) => {
         try {
             // Pass space to backend
             const { data } = await axios.get("/api/topics", {
@@ -40,7 +40,7 @@ export const getAllTopics = createAsyncThunk(
                     search: searchQuery,
                     space: space || "",
                     page: page,
-                    limit: 10
+                    limit: 4
                 },
             });
             return data;
