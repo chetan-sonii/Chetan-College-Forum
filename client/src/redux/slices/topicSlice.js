@@ -3,6 +3,8 @@ import axios from "../../utils/axios";
 
 const initialState = {
     topics: [],
+    totalPages: 1,
+    currentPage: 1,
     topic: {},
     topContributors: [],
     spaces: [],
@@ -36,7 +38,9 @@ export const getAllTopics = createAsyncThunk(
                 params: {
                     sort: sortOption,
                     search: searchQuery,
-                    space: space || "" // Ensure we send empty string if undefined
+                    space: space || "",
+                    page: page,
+                    limit: 10
                 },
             });
             return data;
@@ -168,7 +172,10 @@ const topicSlice = createSlice({
             })
             .addCase(getAllTopics.fulfilled, (state, action) => {
                 state.getAllTopicsIsLoading = false;
-                state.topics = action.payload;
+                // Backend now returns an object { topics, currentPage, totalPages }
+                state.topics = action.payload.topics;
+                state.currentPage = action.payload.currentPage;
+                state.totalPages = action.payload.totalPages;
             })
             .addCase(getAllTopics.rejected, (state) => {
                 state.getAllTopicsIsLoading = false;

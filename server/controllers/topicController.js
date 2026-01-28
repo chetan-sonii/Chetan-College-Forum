@@ -6,8 +6,13 @@ const Space = require("../models/spaceModel");
 module.exports = {
   getAllTopics: async (req, res) => {
     try {
-      // 1. Extract 'space' from query
-      const { search, sort, space } = req.query;
+      // 1. Extract params including page & limit
+      const { search, sort, space, page = 1, limit = 10 } = req.query;
+
+      const pageNum = parseInt(page);
+      const limitNum = parseInt(limit);
+      const skip = (pageNum - 1) * limitNum;
+
       let sortOptions = {};
       let searchQuery = {};
 
@@ -15,33 +20,46 @@ module.exports = {
         searchQuery = { title: new RegExp(search, "i") };
       }
 
-      // 2. Add Space Filter Logic
       if (space && space !== "undefined" && space !== "null" && space !== "") {
         searchQuery.space = space;
       }
 
       if (sort === "latest") {
         sortOptions = { createdAt: -1 };
-      }
-      if (sort === "popular") {
+      } else if (sort === "popular") {
         sortOptions = { viewsCount: -1 };
-      }
-      if (sort === "most_replied") {
+      } else if (sort === "most_replied") {
         sortOptions = { totalComments: -1 };
-      }
-      if (sort === "most_upvoted") {
+      } else if (sort === "most_upvoted") {
         sortOptions = { upvotes: -1 };
+      } else {
+        sortOptions = { createdAt: -1 }; // Default fallback
       }
 
+      // 2. Get Total Count (for calculating total pages)
+      const totalTopics = await Topic.countDocuments(searchQuery);
+      const totalPages = Math.ceil(totalTopics / limitNum);
+
+      // 3. Fetch Paginated Data
       let topics = await Topic.find(searchQuery)
           .sort(sortOptions)
+          .skip(skip)
+          .limit(limitNum)
           .populate("tags")
           .populate({ path: "author", select: { password: 0, __v: 0 } })
           .lean()
           .exec();
-      return res.json(topics);
+
+      // 4. Return Data + Metadata
+      return res.status(200).json({
+        topics,
+        currentPage: pageNum,
+        totalPages,
+        totalTopics
+      });
     } catch (err) {
       console.log(err.message);
+      return res.status(500).json({ message: err.message });
     }
   },
   getTopic: async (req, res) => {
