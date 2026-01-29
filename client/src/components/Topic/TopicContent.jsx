@@ -6,137 +6,134 @@ import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import moment from "moment";
 import {
-  deleteTopic,
-  toggleDownvoteTopic,
-  toggleUpvoteTopic,
+    deleteTopic,
+    toggleDownvoteTopic,
+    toggleUpvoteTopic,
 } from "../../redux/slices/topicSlice";
 import { useDispatch, useSelector } from "react-redux";
+// ✅ IMPORT THIS
+import PollItem from "./Poll/PollItem";
 
 const TopicContent = ({ topic, onDeleting }) => {
-  const dispatch = useDispatch();
-  // FIXED: Added parenthesis to call the hook
-  const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-  const username = JSON.parse(localStorage.getItem("user"))?.username;
-  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
-  const { votingIsLoading, deleteTopicIsLoading } = useSelector(
-      (state) => state.topic
-  );
+    const username = JSON.parse(localStorage.getItem("user"))?.username;
+    const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+    const { votingIsLoading, deleteTopicIsLoading } = useSelector(
+        (state) => state.topic
+    );
 
-  const handleToggleUpvoteTopic = (id) => {
-    dispatch(toggleUpvoteTopic(id));
-  };
+    const handleToggleUpvoteTopic = (id) => {
+        dispatch(toggleUpvoteTopic(id));
+    };
 
-  const handleToggleDownvoteTopic = (id) => {
-    dispatch(toggleDownvoteTopic(id));
-  };
+    const handleToggleDownvoteTopic = (id) => {
+        dispatch(toggleDownvoteTopic(id));
+    };
 
-  return (
-      <>
-        <div className="topic-vote d-flex flex-column align-items-center">
-          <Button
-              disabled={votingIsLoading}
-              onClick={() => {
-                if (!isAuth) navigate("/login");
-                if (isAuth) handleToggleUpvoteTopic(topic?._id);
-              }}
-              className={
-                username && topic?.upvotes?.includes(username) ? "upvoted" : ""
-              }
-          >
-            <GiPlayButton />
-          </Button>
-          <span
-              className={`votes ${
-                  username && topic?.upvotes?.includes(username) ? "upvoted" : ""
-              }${
-                  username && topic?.downvotes?.includes(username) ? "downvoted" : ""
-              }`}
-          >
-          {topic?.upvotes?.length - topic?.downvotes?.length}
-        </span>
-          <Button
-              disabled={votingIsLoading}
-              onClick={() => {
-                if (!isAuth) navigate("/login");
-                if (isAuth) handleToggleDownvoteTopic(topic?._id);
-              }}
-              className={
-                username && topic?.downvotes?.includes(username) ? "downvoted" : ""
-              }
-          >
-            <GiPlayButton />
-          </Button>
-        </div>
-        <div className="topic-item-content">
-          <h4 className="topic-title">{topic?.title}</h4>
-          <div className="topic-meta d-flex align-items-center">
-            <div className="topic-writer d-flex align-items-center">
-              <Link
-                  className="d-flex align-items-center justify-content-center"
-                  to={`/user/${topic?.author?.username}`}
-              >
-                <Image src={topic?.author?.avatar?.url} />
-                <h5 className="writer">{`${topic?.author?.firstName} ${topic?.author?.lastName}`}</h5>
-              </Link>
-              <p className="topic-date">
-                Posted{" "}
-                {moment
-                    .utc(topic?.createdAt)
-                    .local()
-                    .startOf("seconds")
-                    .fromNow()}
-              </p>
-            </div>
-          </div>
-          <p className="topic-summary">{topic?.content}</p>
-          <div className="tags-container d-flex align-items-center">
-          <span className="d-flex align-items-center">
-            <BsFillTagFill />
-            tags:
-          </span>
-            <Nav as="ul" className="tags">
-              {topic?.tags?.length > 0 &&
-                  topic?.tags?.map((tag, i) => {
-                    return (
-                        <Nav.Item key={i} as="li">
-                          <Nav.Link>{tag?.name}</Nav.Link>
-                        </Nav.Item>
-                    );
-                  })}
-            </Nav>
-          </div>
-          <Nav className="thread-actions d-flex align-items-center">
-            <Nav.Link
-                style={{ pointerEvents: "none" }}
-                className="d-flex align-items-center"
-            >
-              <FaEye />
-              {topic?.viewsCount} views
-            </Nav.Link>
-            {username && topic?.author?.username === username && (
-                <Nav.Link
-                    disabled={deleteTopicIsLoading}
+    return (
+        <>
+            <div className="topic-vote d-flex flex-column align-items-center">
+                {/* ... (Keep existing voting buttons) ... */}
+                <Button
+                    disabled={votingIsLoading}
                     onClick={() => {
-                      if (!isAuth) {
-                        navigate("/login");
-                        return;
-                      }
-                      if (isAuth) {
-                        dispatch(deleteTopic(topic?._id));
-                        onDeleting();
-                      }
+                        if (!isAuth) navigate("/login");
+                        if (isAuth) handleToggleUpvoteTopic(topic?._id);
                     }}
-                    className="d-flex align-items-center"
+                    className={
+                        username && topic?.upvotes?.includes(username) ? "upvoted" : ""
+                    }
                 >
-                  <MdDelete />
-                  delete this topic
-                </Nav.Link>
-            )}
-          </Nav>
-        </div>
-      </>
-  );
+                    <GiPlayButton />
+                </Button>
+                <span className="votes">
+             {topic?.upvotes?.length - topic?.downvotes?.length}
+          </span>
+                <Button
+                    disabled={votingIsLoading}
+                    onClick={() => {
+                        if (!isAuth) navigate("/login");
+                        if (isAuth) handleToggleDownvoteTopic(topic?._id);
+                    }}
+                    className={
+                        username && topic?.downvotes?.includes(username) ? "downvoted" : ""
+                    }
+                >
+                    <GiPlayButton />
+                </Button>
+            </div>
+
+            <div className="topic-item-content">
+                <h4 className="topic-title">{topic?.title}</h4>
+
+                <div className="topic-meta d-flex align-items-center">
+                    <div className="topic-writer d-flex align-items-center">
+                        <Link
+                            className="d-flex align-items-center justify-content-center"
+                            to={`/user/${topic?.author?.username}`}
+                        >
+                            {/* Safe check for avatar */}
+                            <Image src={topic?.author?.avatar?.url} />
+                            <h5 className="writer">
+                                {/* Safe check for name */}
+                                {topic?.author
+                                    ? `${topic.author.firstName} ${topic.author.lastName}`
+                                    : "Unknown User"}
+                            </h5>
+                        </Link>
+                        <p className="topic-date">
+                            Posted{" "}
+                            {moment(topic?.createdAt).fromNow()}
+                        </p>
+                    </div>
+                </div>
+
+                <p className="topic-summary">{topic?.content}</p>
+
+                {/* ✅ RENDER POLL HERE */}
+                {topic?.poll && topic.poll.question && (
+                    <div className="mb-4">
+                        <PollItem poll={topic.poll} topicId={topic._id} />
+                    </div>
+                )}
+
+                <div className="tags-container d-flex align-items-center">
+            <span className="d-flex align-items-center">
+                <BsFillTagFill /> tags:
+            </span>
+                    <Nav as="ul" className="tags">
+                        {topic?.tags?.map((tag, i) => (
+                            <Nav.Item key={i} as="li">
+                                <Nav.Link>{tag?.name}</Nav.Link>
+                            </Nav.Item>
+                        ))}
+                    </Nav>
+                </div>
+
+                <Nav className="thread-actions d-flex align-items-center">
+                    <Nav.Link style={{ pointerEvents: "none" }} className="d-flex align-items-center">
+                        <FaEye /> {topic?.viewsCount} views
+                    </Nav.Link>
+                    {username && topic?.author?.username === username && (
+                        <Nav.Link
+                            disabled={deleteTopicIsLoading}
+                            onClick={() => {
+                                if (isAuth) {
+                                    dispatch(deleteTopic(topic?._id));
+                                    onDeleting();
+                                }
+                            }}
+                            className="d-flex align-items-center"
+                        >
+                            <MdDelete /> delete this topic
+                        </Nav.Link>
+                    )}
+                </Nav>
+            </div>
+        </>
+    );
 };
 
 export default TopicContent;

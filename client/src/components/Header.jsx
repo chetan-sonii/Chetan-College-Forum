@@ -26,9 +26,10 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, token, isHeaderLoading } = useSelector((state) => state.auth);
+
+  // Check localStorage directly for immediate UI feedback
   const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
 
-  // side-effect: refresh token if needed
   useEffect(() => {
     if (isAuth && !token) {
       dispatch(refresh_token());
@@ -37,7 +38,7 @@ const Header = () => {
 
   const handleSubmitSearch = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // Prevent form submission refresh
+      e.preventDefault();
       dispatch(setSearchQuery(search));
       navigate("/");
     }
@@ -76,23 +77,26 @@ const Header = () => {
                 </Form>
               </Col>
               <Nav className="align-items-center">
+
+                {/* 1. SKELETON: Only show if we think we are logged in AND loading */}
                 {isAuth && isHeaderLoading && (
                     <>
-                  <span>
-                    <Skeleton
-                        style={{ marginRight: "8px" }}
-                        circle
-                        width={45}
-                        height={45}
-                    />
-                  </span>
                       <span>
-                    <Skeleton width={100} height={20} />
-                  </span>
+                        <Skeleton
+                            style={{ marginRight: "8px" }}
+                            circle
+                            width={45}
+                            height={45}
+                        />
+                      </span>
+                      <span>
+                        <Skeleton width={100} height={20} />
+                      </span>
                     </>
                 )}
 
-                {isAuth && !isHeaderLoading && hasUser && (
+                {/* 2. PROFILE: Show if we have user data (Loading or not, if data exists, show it) */}
+                {hasUser && (
                     <Dropdown className="profile">
                       <Dropdown.Toggle
                           as="div"
@@ -135,7 +139,9 @@ const Header = () => {
                     </Dropdown>
                 )}
 
-                {!isAuth && !isHeaderLoading && (
+                {/* 3. LOGIN BUTTONS: Show if NO user AND (Not Auth OR Not Loading) */}
+                {/* Fix: If !isAuth, we show buttons immediately regardless of loading state */}
+                {!hasUser && !(isAuth && isHeaderLoading) && (
                     <>
                       <Link className="login" to="/login">
                         <Button className="login">Login</Button>

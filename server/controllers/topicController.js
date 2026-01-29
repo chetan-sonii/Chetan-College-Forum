@@ -93,6 +93,7 @@ module.exports = {
     try {
       const { title, content, selectedSpace, selectedTags, poll } = req.body;
 
+      // 1. Process Tags
       let createdTags = [];
       for (let index = 0; index < selectedTags.length; index++) {
         let name = selectedTags[index].value;
@@ -108,6 +109,7 @@ module.exports = {
         }
       }
 
+      // 2. Generate Slug
       const slug = title
           .toString()
           .normalize("NFKD")
@@ -119,7 +121,7 @@ module.exports = {
           .replace(/\-\-+/g, "-")
           .replace(/\-$/g, "");
 
-      // Handle Poll Data
+      // 3. Process Poll Data (THIS WAS MISSING)
       let pollData = null;
       if (poll && poll.question && poll.options.length >= 2) {
         let expiresAt = null;
@@ -136,6 +138,7 @@ module.exports = {
         };
       }
 
+      // 4. Create Topic
       let topic = await Topic.create({
         owner: req.user.username,
         title: title.trim(),
@@ -143,11 +146,10 @@ module.exports = {
         slug: slug.trim(),
         tags: createdTags,
         space: selectedSpace,
-        poll: pollData,
-        author: req.user._id // ✅ FIX: Save the Author ID
+        poll: pollData,      // ✅ Save Poll
+        author: req.user._id // ✅ Save Author (Fixes "undefined undefined")
       });
 
-      // Populate author immediately so the frontend receives it
       topic = await topic.populate({
         path: "author",
         select: { password: 0, __v: 0 },
