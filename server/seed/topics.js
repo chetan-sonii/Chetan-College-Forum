@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const Topic = require("../models/topicModel");
+const User = require("../models/userModel");
 require("dotenv").config();
 
-const topics = [
+const topicsData = [
         {
             owner: "admin",
             title: "What is the difference between REST and GraphQL?",
@@ -174,8 +175,25 @@ const topics = [
 (async () => {
     try {
         await mongoose.connect('mongodb+srv://chetansonii2000_db_user:chetan309204@collegeforum.y1vvpxj.mongodb.net/');
-        await Topic.insertMany(topics);
-        console.log("✅ Topics seeded successfully");
+
+        // ✅ ADD: Find default user for topics without matching users
+        let defaultUser = await User.findOne({ username: "admin" });
+        if (!defaultUser) {
+            console.log("⚠️  No 'admin' user found. Topics will be created without author field.");
+        }
+
+        // ✅ ADD: Process topics and assign author IDs
+        const topicsWithAuthor = [];
+        for (const topicData of topicsData) {
+            const user = await User.findOne({ username: topicData.owner });
+            topicsWithAuthor.push({
+                ...topicData,
+                author: user ? user._id : (defaultUser ? defaultUser._id : null)
+            });
+        }
+
+        await Topic.insertMany(topicsWithAuthor);  // ✅ CHANGE: Use topicsWithAuthor
+        console.log("✅ Topics seeded successfully with author references");
         process.exit(0);
     } catch (err) {
         console.error(err);

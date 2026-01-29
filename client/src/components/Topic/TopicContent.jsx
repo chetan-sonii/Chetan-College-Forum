@@ -19,32 +19,22 @@ const TopicContent = ({ topic, onDeleting }) => {
     const navigate = useNavigate();
 
     const username = JSON.parse(localStorage.getItem("user"))?.username;
-    const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
-    const { votingIsLoading, deleteTopicIsLoading } = useSelector(
-        (state) => state.topic
-    );
+    const isAuth = !!localStorage.getItem("isLoggedIn");
+    const { votingIsLoading, deleteTopicIsLoading } = useSelector((state) => state.topic);
 
-    const handleToggleUpvoteTopic = (id) => {
-        dispatch(toggleUpvoteTopic(id));
-    };
-
-    const handleToggleDownvoteTopic = (id) => {
-        dispatch(toggleDownvoteTopic(id));
-    };
+    const handleToggleUpvoteTopic = (id) => { dispatch(toggleUpvoteTopic(id)); };
+    const handleToggleDownvoteTopic = (id) => { dispatch(toggleDownvoteTopic(id)); };
 
     return (
         <>
             <div className="topic-vote d-flex flex-column align-items-center">
-                {/* ... (Keep existing voting buttons) ... */}
                 <Button
                     disabled={votingIsLoading}
                     onClick={() => {
                         if (!isAuth) navigate("/login");
                         if (isAuth) handleToggleUpvoteTopic(topic?._id);
                     }}
-                    className={
-                        username && topic?.upvotes?.includes(username) ? "upvoted" : ""
-                    }
+                    className={username && topic?.upvotes?.includes(username) ? "upvoted" : ""}
                 >
                     <GiPlayButton />
                 </Button>
@@ -57,9 +47,7 @@ const TopicContent = ({ topic, onDeleting }) => {
                         if (!isAuth) navigate("/login");
                         if (isAuth) handleToggleDownvoteTopic(topic?._id);
                     }}
-                    className={
-                        username && topic?.downvotes?.includes(username) ? "downvoted" : ""
-                    }
+                    className={username && topic?.downvotes?.includes(username) ? "downvoted" : ""}
                 >
                     <GiPlayButton />
                 </Button>
@@ -67,25 +55,18 @@ const TopicContent = ({ topic, onDeleting }) => {
 
             <div className="topic-item-content">
                 <h4 className="topic-title">{topic?.title}</h4>
-
                 <div className="topic-meta d-flex align-items-center">
                     <div className="topic-writer d-flex align-items-center">
-                        <Link
-                            className="d-flex align-items-center justify-content-center"
-                            to={`/user/${topic?.author?.username}`}
-                        >
-                            {/* Safe check for avatar */}
+                        <Link className="d-flex align-items-center justify-content-center" to={`/user/${topic?.author?.username}`}>
+                            {/* ✅ Safe Check for Avatar */}
                             <Image src={topic?.author?.avatar?.url} />
+                            {/* ✅ Safe Check for Name */}
                             <h5 className="writer">
-                                {/* Safe check for name */}
-                                {topic?.author
-                                    ? `${topic.author.firstName} ${topic.author.lastName}`
-                                    : "Unknown User"}
+                                {topic?.author ? `${topic.author.firstName} ${topic.author.lastName}` : "Unknown User"}
                             </h5>
                         </Link>
                         <p className="topic-date">
-                            Posted{" "}
-                            {moment(topic?.createdAt).fromNow()}
+                            Posted {moment(topic?.createdAt).fromNow()}
                         </p>
                     </div>
                 </div>
@@ -100,14 +81,10 @@ const TopicContent = ({ topic, onDeleting }) => {
                 )}
 
                 <div className="tags-container d-flex align-items-center">
-            <span className="d-flex align-items-center">
-                <BsFillTagFill /> tags:
-            </span>
+                    <span className="d-flex align-items-center"><BsFillTagFill /> tags:</span>
                     <Nav as="ul" className="tags">
                         {topic?.tags?.map((tag, i) => (
-                            <Nav.Item key={i} as="li">
-                                <Nav.Link>{tag?.name}</Nav.Link>
-                            </Nav.Item>
+                            <Nav.Item key={i} as="li"><Nav.Link>{tag?.name}</Nav.Link></Nav.Item>
                         ))}
                     </Nav>
                 </div>

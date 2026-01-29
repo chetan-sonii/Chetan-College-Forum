@@ -65,7 +65,7 @@ export const getTopic = createAsyncThunk(
 export const addTopic = createAsyncThunk(
     "topic/addTopic",
     async (
-        { title, content, selectedSpace, selectedTags },
+        { title, content, selectedSpace, selectedTags,poll },
         { rejectWithValue }
     ) => {
         try {
@@ -74,6 +74,7 @@ export const addTopic = createAsyncThunk(
                 content,
                 selectedSpace,
                 selectedTags,
+                poll,
             });
             return data;
         } catch (err) {
