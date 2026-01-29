@@ -12,12 +12,12 @@ import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import PollItem from "./Poll/PollItem";
 
-// making some changes..........
+
 const TopicItem = ({ topic }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const username = JSON.parse(localStorage.getItem("user"))?.username;
-  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+  const isAuth = !!localStorage.getItem("isLoggedIn");
   const { votingIsLoading } = useSelector((state) => state.topic);
 
   const handleToggleUpvoteTopic = (id) => {

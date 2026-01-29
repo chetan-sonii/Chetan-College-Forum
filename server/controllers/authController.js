@@ -33,7 +33,7 @@ module.exports = {
           message: "An account already exists with this username!",
         });
       }
-      delete existingUser;
+      // delete existingUser;
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
         firstName: firstName,

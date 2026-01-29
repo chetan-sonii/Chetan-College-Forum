@@ -55,7 +55,10 @@ export const getTopic = createAsyncThunk(
     async ({ id, slug }, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(`/api/topics/${id}/${slug}`);
+            console.log(data);
+            console.log(id, slug);
             return data;
+
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -76,6 +79,7 @@ export const addTopic = createAsyncThunk(
                 selectedTags,
                 poll,
             });
+            console.log(data);
             return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
@@ -90,7 +94,7 @@ export const voteOnPoll = createAsyncThunk(
     async ({ topicId, optionIndex }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post(`/api/topics/${topicId}/poll/vote`, {
-                optionIndex,
+                optionIndex,topicId
             });
             return data;
         } catch (err) {

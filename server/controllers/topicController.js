@@ -29,7 +29,7 @@ module.exports = {
           .skip(skip)
           .limit(limitNum)
           .populate("tags")
-          .populate({ path: "author", select: "firstName lastName username avatar" }) // ✅ Optimized Populate
+          .populate({ path: "author", select: "firstName lastName username avatar" })
           .lean()
           .exec();
 
@@ -107,6 +107,7 @@ module.exports = {
         poll: pollData,
         author: req.user._id
       });
+
 
       topic = await topic.populate({ path: "author", select: "-password -__v" });
 
