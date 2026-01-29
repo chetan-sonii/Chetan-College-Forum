@@ -4,7 +4,11 @@ const Comment = require("../models/commentModel");
 const Space = require("../models/spaceModel");
 
 module.exports = {
+  // ... keep getAllTopics and getTopic ...
   getAllTopics: async (req, res) => {
+    // (Keep your existing getAllTopics logic from previous step)
+    // I am omitting it here to save space, but DO NOT DELETE IT from your file.
+    // ...
     try {
       // 1. Extract params including page & limit
       const { search, sort, space, page = 1, limit = 10 } = req.query;
@@ -62,26 +66,29 @@ module.exports = {
       return res.status(500).json({ message: err.message });
     }
   },
+
   getTopic: async (req, res) => {
+    // (Keep existing getTopic)
     const { slug } = req.params;
     try {
       const topic = await Topic.findOneAndUpdate(
-        { slug },
-        {
-          $inc: { viewsCount: 1 },
-        },
-        { returnOriginal: false }
+          { slug },
+          {
+            $inc: { viewsCount: 1 },
+          },
+          { returnOriginal: false }
       )
-        .populate("tags")
-        .populate({ path: "author", select: { password: 0, __v: 0 } })
-        .lean()
-        .exec();
+          .populate("tags")
+          .populate({ path: "author", select: { password: 0, __v: 0 } })
+          .lean()
+          .exec();
       return res.status(200).json(topic);
     } catch (err) {
       console.log(err.message);
     }
   },
-// ✅ UPDATED addTopic
+
+  // ✅ UPDATED addTopic
   addTopic: async (req, res) => {
     try {
       const { title, content, selectedSpace, selectedTags, poll } = req.body;
@@ -194,7 +201,7 @@ module.exports = {
     }
   },
 
-
+  // ... keep deleteTopic, toggleUpvoteTopic, toggleDownvoteTopic, getTopContributors, getSpaces ...
   deleteTopic: async (req, res) => {
     try {
       const { id } = req.params;
