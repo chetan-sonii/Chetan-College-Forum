@@ -47,8 +47,8 @@ module.exports = {
           { $inc: { viewsCount: 1 } },
           { returnOriginal: false }
       )
-          .populate("tags")
-          .populate({ path: "author", select: "-password -__v" })
+          .populate('author', 'firstName lastName')
+          .populate('space', 'name')
           .lean()
           .exec();
       return res.status(200).json(topic);
@@ -60,60 +60,29 @@ module.exports = {
   // ✅ THIS IS THE FIXED FUNCTION
   addTopic: async (req, res) => {
     try {
-      const { title, content, selectedSpace, selectedTags, poll } = req.body;
+      const { title, content, space, tags } = req.body;
 
-      // 1. Process Tags
-      let createdTags = [];
-      for (let index = 0; index < selectedTags.length; index++) {
-        let name = selectedTags[index].value;
-        let tagFound = await Tag.findOne({ name });
-        if (!tagFound) {
-          let tag = await Tag.create({ name, createdBy: req.user.username });
-          createdTags.push(tag._id);
-        } else {
-          createdTags.push(tagFound._id);
-        }
-      }
-
-      // 2. Generate Slug
-      const slug = title.toString().normalize("NFKD").toLowerCase().trim()
-          .replace(/\s+/g, "-").replace(/[^\w\-]+/g, "").replace(/\_/g, "-")
-          .replace(/\-\-+/g, "-").replace(/\-$/g, "");
-
-      // 3. Process Poll Data
-      let pollData = null;
-      if (poll && poll.question && poll.options.length >= 2) {
-        let expiresAt = null;
-        if (poll.duration > 0) {
-          expiresAt = new Date();
-          expiresAt.setDate(expiresAt.getDate() + parseInt(poll.duration));
-        }
-        pollData = {
-          question: poll.question,
-          options: poll.options.map(opt => ({ text: opt, votes: 0 })),
-          voters: [],
-          expiresAt: expiresAt
-        };
-      }
-
-      // 4. Create Topic with AUTHOR and POLL
-      let topic = await Topic.create({
-        owner: req.user.username,
-        title: title.trim(),
-        content: content.trim(),
-        slug: slug.trim(),
-        tags: createdTags,
-        space: selectedSpace,
-        poll: pollData,
-        author: req.user._id
+      // 1. Create the topic
+      let newTopic = await Topic.create({
+        title,
+        content,
+        space,
+        tags,
+        author: req.user._id, // Ensure we use the authenticated user's ID
       });
 
+      // 2. CRITICAL STEP: Populate the author details immediately
+      // We must match the same fields selected in getAllTopics
+      newTopic = await newTopic.populate({
+        path: "author",
+        select: "firstName lastName username avatar"
+      });
 
-      topic = await topic.populate({ path: "author", select: "-password -__v" });
+      // 3. Send the populated topic back to the frontend
+      return res.status(201).json(newTopic);
 
-      return res.status(201).json({ topic, message: "Topic created successfully!" });
     } catch (err) {
-      return res.status(400).json({ message: err.message });
+      return res.status(500).json({ error: err.message });
     }
   },
 

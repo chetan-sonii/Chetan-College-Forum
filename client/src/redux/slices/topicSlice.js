@@ -82,6 +82,7 @@ export const addTopic = createAsyncThunk(
             console.log(data);
             return data;
         } catch (err) {
+            console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
