@@ -37,8 +37,7 @@ export const deleteComment = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const { data } = await axios.delete(`/api/comments/${id}`);
-            console.log(data);
-return data;
+            return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -197,9 +196,7 @@ const commentSlice = createSlice({
             })
             .addCase(deleteComment.fulfilled, (state, action) => {
                 state.deleteCommentLoading = false;
-                state.comments = state.comments.filter(
-                    (comment) => !action.payload.deletedComments.includes(comment._id)
-                );
+                state.comments = state.comments.filter((c) => c._id !== action.payload.commentId);
             })
             .addCase(deleteComment.rejected, (state) => {
                 state.deleteCommentLoading = false;

@@ -65,31 +65,31 @@ module.exports = {
       console.log(err.message);
     }
   },
-  deleteComment: async (req, res) => {
-    let { id } = req.params;
-    try {
-      repliesToDelete = [];
-      const rootComment = await Comment.findById(id);
-      if (req.user.username !== rootComment.owner) {
-        return res.status(403).json({
-          message: "You are not allowed to delete this comment",
-        });
-      }
-      const comments = await Comment.find();
-      nest(comments, rootComment._id.toString());
-      repliesToDelete.push(rootComment._id);
-      await Comment.deleteMany({ _id: repliesToDelete });
-      await Topic.findByIdAndUpdate(rootComment.parentTopic, {
-        $inc: { totalComments: -repliesToDelete.length },
-      });
-      return res.status(200).json({
-        deletedComments: repliesToDelete,
-        message: "Comment Successfully Deleted!",
-      });
-    } catch (err) {
-      console.log(err.message);
-    }
-  },
+  // deleteComment: async (req, res) => {
+  //   let { id } = req.params;
+  //   try {
+  //     repliesToDelete = [];
+  //     const rootComment = await Comment.findById(id);
+  //     if (req.user.username !== rootComment.owner) {
+  //       return res.status(403).json({
+  //         message: "You are not allowed to delete this comment",
+  //       });
+  //     }
+  //     const comments = await Comment.find();
+  //     nest(comments, rootComment._id.toString());
+  //     repliesToDelete.push(rootComment._id);
+  //     await Comment.deleteMany({ _id: repliesToDelete });
+  //     await Topic.findByIdAndUpdate(rootComment.parentTopic, {
+  //       $inc: { totalComments: -repliesToDelete.length },
+  //     });
+  //     return res.status(200).json({
+  //       deletedComments: repliesToDelete,
+  //       message: "Comment Successfully Deleted!",
+  //     });
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // },
   toggleUpvoteComment: async (req, res) => {
     const { id } = req.params;
     try {
@@ -176,6 +176,29 @@ module.exports = {
       return res.status(200).json(topHelpers);
     } catch (err) {
       console.log(err.message);
+    }
+  },
+  deleteComment: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const comment = await Comment.findById(id).populate("user", "username");
+
+      if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+      // Check if the requester is the owner of the comment
+      if (comment.user.username !== req.user.username) {
+        return res.status(403).json({ message: "You are not allowed to delete this comment" });
+      }
+
+      await Comment.findByIdAndDelete(id);
+
+      // Decrement the totalComments count on the Topic
+      const Topic = require("../models/topicModel"); // Ensure Topic model is imported
+      await Topic.findByIdAndUpdate(comment.parentTopic, { $inc: { totalComments: -1 } });
+
+      return res.status(200).json({ commentId: id, message: "Comment deleted successfully" });
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
     }
   },
 };

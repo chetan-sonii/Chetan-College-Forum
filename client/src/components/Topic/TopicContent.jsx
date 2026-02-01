@@ -4,6 +4,8 @@ import { BsFillTagFill } from "react-icons/bs";
 import { GiPlayButton } from "react-icons/gi";
 import { FaEye } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { reportTopic } from "../../redux/slices/topicSlice";
+import { MdReportProblem } from "react-icons/md";
 import moment from "moment";
 import {
     deleteTopic,
@@ -32,6 +34,15 @@ const TopicContent = ({ topic, onDeleting }) => {
         (topic?.author?.username === username) ||
         (topic?.owner === username)
     );
+    const handleReport = () => {
+        if (!isAuth) return navigate("/login");
+
+        const reason = prompt("Why are you reporting this topic?");
+        if (reason && reason.trim().length > 0) {
+            dispatch(reportTopic({ id: topic._id, reason }));
+            alert("Report submitted for review.");
+        }
+    };
 
     return (
         <>
@@ -102,6 +113,9 @@ const TopicContent = ({ topic, onDeleting }) => {
                 <Nav className="thread-actions d-flex align-items-center">
                     <Nav.Link style={{ pointerEvents: "none" }} className="d-flex align-items-center">
                         <FaEye /> {topic?.viewsCount} views
+                    </Nav.Link>
+                    <Nav.Link onClick={handleReport} className="d-flex align-items-center text-warning">
+                        <MdReportProblem /> Report
                     </Nav.Link>
 
                     {/* ✅ FIX: Use the robust isOwner check */}

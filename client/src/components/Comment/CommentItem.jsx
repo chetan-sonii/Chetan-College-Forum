@@ -1,4 +1,4 @@
-import { Nav, Image } from "react-bootstrap";
+import {Nav, Image, Button} from "react-bootstrap";
 import { GiPlayButton } from "react-icons/gi";
 import { RiCheckFill } from "react-icons/ri";
 import { MdReply, MdDelete } from "react-icons/md";
@@ -15,6 +15,7 @@ import {
 } from "../../redux/slices/commentSlice";
 import { useNavigate } from "react-router-dom";
 
+
 const CommentItem = (props) => {
   const [isOpen, setIsOpen] = useState(null);
   const [toDelete, setToDelete] = useState(null);
@@ -24,10 +25,12 @@ const CommentItem = (props) => {
 
   // Safe parsing for user
   const user = JSON.parse(localStorage.getItem("user"));
+  const currentUser = JSON.parse(localStorage.getItem("user"));
   const username = user?.username;
+
   const avatar = user?.avatar?.url;
 
-  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+  const isAuth = !!localStorage.getItem("isLoggedIn");
   const { votingIsLoading, deleteCommentLoading } = useSelector(
       (state) => state.comment
   );
@@ -128,20 +131,25 @@ const CommentItem = (props) => {
                       {username && comment?.author?.username === username && (
                           <Nav.Link
                               disabled={deleteCommentLoading}
-                              onClick={() => {
-                                if (!isAuth) {
-                                  navigate("/login");
-                                  return;
-                                }
-                                if (isAuth) {
-                                  setToDelete(comment?._id);
-                                  dispatch(deleteComment(comment?._id));
-                                }
-                              }}
+                              // onClick={() => {
+                              //   if (!isAuth) {
+                              //     navigate("/login");
+                              //     return;
+                              //   }
+                              //   if (isAuth) {
+                              //     setToDelete(comment?._id);
+                              //     dispatch(deleteComment(comment?._id));
+                              //   }
+                              // }}
                               className="d-flex align-items-center"
                           >
-                            <MdDelete />
-                            Delete
+                            <Button
+                                variant="link"
+                                className="text-danger p-0"
+                                onClick={() => dispatch(deleteComment(comment._id))}
+                            >
+                              <MdDelete size={18} />
+                            </Button>
                           </Nav.Link>
                       )}
                     </Nav>

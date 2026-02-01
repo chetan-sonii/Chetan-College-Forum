@@ -301,4 +301,32 @@ module.exports = {
       console.log(err.message);
     }
   },
+  reportTopic: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+
+      const topic = await Topic.findById(id);
+      if (!topic) return res.status(404).json({ message: "Topic not found" });
+
+      // Check if user already reported
+      const alreadyReported = topic.reports.find(
+          (r) => r.reporter.toString() === req.user._id.toString()
+      );
+
+      if (alreadyReported) {
+        return res.status(400).json({ message: "You have already reported this topic." });
+      }
+
+      topic.reports.push({
+        reporter: req.user._id,
+        reason: reason,
+      });
+
+      await topic.save();
+      return res.status(200).json({ message: "Topic reported successfully." });
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
 };
