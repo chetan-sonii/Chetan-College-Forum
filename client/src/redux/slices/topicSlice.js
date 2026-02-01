@@ -31,20 +31,23 @@ const initialState = {
 export const getAllTopics = createAsyncThunk(
     "topic/getAllTopics",
     // Accept object with space
-    async ({ sortOption, searchQuery, space, page }, { rejectWithValue }) => {
+    async ({ sortOption, searchQuery, space, page,tag }, { rejectWithValue }) => {
+        console.log("tags: ", tag);
         try {
             // Pass space to backend
+            console.log("tags: ", tag);
             const { data } = await axios.get("/api/topics", {
                 params: {
                     sort: sortOption,
                     search: searchQuery,
                     space: space || "",
                     page: page,
-                    limit: 4
+                    limit: 4,
+                    tag: tag,
                 },
             });
             console.log(data);
-return data;
+        return data;
         } catch (err) {
 	console.log(err);
 
