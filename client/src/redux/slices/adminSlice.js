@@ -1,6 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../utils/axios";
 
+
+
+const attachToken = () => {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+};
 // Helper to set token
 const setAdminToken = (token) => {
     if (token) {
@@ -47,6 +55,7 @@ export const getAdminUsers = createAsyncThunk(
     "admin/getUsers",
     async (searchQuery = "", { rejectWithValue }) => {
         try {
+            attachToken(); // ✅ Ensure token is attached before request
             const { data } = await axios.get(`/api/admin/users?search=${searchQuery}`);
             return data;
         } catch (err) {
@@ -60,6 +69,7 @@ export const manageUser = createAsyncThunk(
     "admin/manageUser",
     async ({ id, action }, { rejectWithValue }) => {
         try {
+            attachToken(); // ✅ Ensure token is attached
             const { data } = await axios.post(`/api/admin/users/${id}/manage`, { action });
             return data;
         } catch (err) {

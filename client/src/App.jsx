@@ -6,6 +6,7 @@ import {
   Navigate,
   Outlet,
 } from "react-router-dom"; //
+import { useEffect } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
@@ -28,12 +29,20 @@ import "./App.css";
 import "./poll.css";
 import "./Responsive.css";
 import { useSelector } from "react-redux";
+import axios from "./utils/axios";
 
 // ✅ Admin Imports
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminLayout from "./components/Admin/AdminLayout";
 import Dashboard from "./pages/Admin/Dashboard";
 import UsersTable from "./pages/Admin/UsersTable";
+useEffect(() => {
+  const adminToken = localStorage.getItem("adminToken");
+  if (adminToken) {
+    // Restore the token to Axios headers so requests don't fail
+    axios.defaults.headers.common["Authorization"] = `Bearer ${adminToken}`;
+  }
+}, []);
 
 // ✅ 1. Create a Layout for the Main Website (Includes Header)
 const MainLayout = () => {
@@ -47,7 +56,7 @@ const MainLayout = () => {
 
 const App = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+  const isAuth = !!localStorage.getItem("isLoggedIn");
 
   return (
       <Router>
