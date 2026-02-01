@@ -130,7 +130,7 @@ module.exports = {
         return res.status(400).json({ message: "Poll has expired" });
       }
 
-      if (topic.poll.voters.some(v => v.toString() === userId.toString())) {
+      if (topic.poll.voters.some(v => v === userId)) {
         return res.status(400).json({ message: "You have already voted" });
       }
 
@@ -140,6 +140,7 @@ module.exports = {
 
       return res.status(200).json({ poll: topic.poll, topicId: id, message: "Vote registered!" });
     } catch (err) {
+
       return res.status(500).json({ message: err.message });
     }
   },

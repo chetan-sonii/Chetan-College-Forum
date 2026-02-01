@@ -96,8 +96,12 @@ export const voteOnPoll = createAsyncThunk(
             const { data } = await axios.post(`/api/topics/${topicId}/poll/vote`, {
                 optionIndex,topicId
             });
+            console.log(data);
+            console.log(topicId);
+            console.log(optionIndex);
             return data;
         } catch (err) {
+            console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
