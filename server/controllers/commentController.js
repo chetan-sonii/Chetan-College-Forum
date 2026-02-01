@@ -179,25 +179,54 @@ module.exports = {
     }
   },
   deleteComment: async (req, res) => {
+    const { id } = req.params;
     try {
-      const { id } = req.params;
-      const comment = await Comment.findById(id).populate("user", "username");
+      // 1. Find the comment
+      const rootComment = await Comment.findById(id);
 
-      if (!comment) return res.status(404).json({ message: "Comment not found" });
-
-      // Check if the requester is the owner of the comment
-      if (comment.user.username !== req.user.username) {
-        return res.status(403).json({ message: "You are not allowed to delete this comment" });
+      // ✅ Safety Check: Handle if comment doesn't exist
+      if (!rootComment) {
+        return res.status(404).json({ message: "Comment not found" });
       }
 
-      await Comment.findByIdAndDelete(id);
+      // 2. Permission Check
+      if (req.user.username !== rootComment.owner) {
+        return res.status(403).json({
+          message: "You are not allowed to delete this comment",
+        });
+      }
 
-      // Decrement the totalComments count on the Topic
-      const Topic = require("../models/topicModel"); // Ensure Topic model is imported
-      await Topic.findByIdAndUpdate(comment.parentTopic, { $inc: { totalComments: -1 } });
+      // 3. Find all comments in this TOPIC only (Optimization)
+      const topicComments = await Comment.find({ parentTopic: rootComment.parentTopic });
 
-      return res.status(200).json({ commentId: id, message: "Comment deleted successfully" });
+      // 4. Recursive Logic (Locally scoped)
+      let repliesToDelete = [rootComment._id];
+
+      const findReplies = (comments, parentId) => {
+        comments
+            .filter(c => c.parentComment?.toString() === parentId.toString())
+            .forEach(c => {
+              repliesToDelete.push(c._id);
+              findReplies(comments, c._id);
+            });
+      };
+
+      findReplies(topicComments, rootComment._id);
+
+      // 5. Delete All
+      await Comment.deleteMany({ _id: { $in: repliesToDelete } });
+
+      // 6. Update Topic Count
+      await Topic.findByIdAndUpdate(rootComment.parentTopic, {
+        $inc: { totalComments: -repliesToDelete.length },
+      });
+
+      return res.status(200).json({
+        deletedComments: repliesToDelete,
+        message: "Comment Successfully Deleted!",
+      });
     } catch (err) {
+      console.log(err.message);
       return res.status(500).json({ message: err.message });
     }
   },

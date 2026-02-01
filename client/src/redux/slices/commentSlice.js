@@ -37,8 +37,10 @@ export const deleteComment = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const { data } = await axios.delete(`/api/comments/${id}`);
+            console.log(data);
             return data;
         } catch (err) {
+            console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
@@ -104,11 +106,8 @@ const commentSlice = createSlice({
     name: "comment",
     initialState,
     reducers: {
-        // NEW: Real-time update reducer
         addRealTimeComment: (state, action) => {
-            const exists = state.comments.find(
-                (c) => c._id === action.payload._id
-            );
+            const exists = state.comments.find((c) => c._id === action.payload._id);
             if (!exists) {
                 state.comments.push(action.payload);
             }
@@ -191,16 +190,28 @@ const commentSlice = createSlice({
             .addCase(toggleDownvoteComment.rejected, (state) => {
                 state.votingIsLoading = false;
             })
+
+
+
             .addCase(deleteComment.pending, (state) => {
                 state.deleteCommentLoading = true;
             })
             .addCase(deleteComment.fulfilled, (state, action) => {
                 state.deleteCommentLoading = false;
-                state.comments = state.comments.filter((c) => c._id !== action.payload.commentId);
+                // Filter out ANY comment whose ID is in the deletedComments array
+                // We convert both to strings to ensure they match even if one is an object
+                state.comments = state.comments.filter(
+                    (comment) => !action.payload.deletedComments.some(
+                        deletedId => deletedId.toString() === comment._id.toString()
+                    )
+                );
             })
             .addCase(deleteComment.rejected, (state) => {
                 state.deleteCommentLoading = false;
             })
+
+
+
             .addCase(getTopHelpers.pending, (state) => {
                 state.herlpersIsLoading = true;
             })

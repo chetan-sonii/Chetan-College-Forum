@@ -79,6 +79,8 @@ const UserSchema = new mongoose.Schema(
           ref: "User",
         },
       ],
+
+      savedTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }]
     },
     { timestamps: true }
 );

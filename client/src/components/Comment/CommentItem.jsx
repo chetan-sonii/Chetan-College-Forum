@@ -131,16 +131,16 @@ const CommentItem = (props) => {
                       {username && comment?.author?.username === username && (
                           <Nav.Link
                               disabled={deleteCommentLoading}
-                              // onClick={() => {
-                              //   if (!isAuth) {
-                              //     navigate("/login");
-                              //     return;
-                              //   }
-                              //   if (isAuth) {
-                              //     setToDelete(comment?._id);
-                              //     dispatch(deleteComment(comment?._id));
-                              //   }
-                              // }}
+                              onClick={() => {
+                                if (!isAuth) {
+                                  navigate("/login");
+                                  return;
+                                }
+                                if (isAuth) {
+                                  setToDelete(comment?._id);
+                                  dispatch(deleteComment(comment?._id));
+                                }
+                              }}
                               className="d-flex align-items-center"
                           >
                             <Button
@@ -149,6 +149,7 @@ const CommentItem = (props) => {
                                 onClick={() => dispatch(deleteComment(comment._id))}
                             >
                               <MdDelete size={18} />
+                              Delete
                             </Button>
                           </Nav.Link>
                       )}

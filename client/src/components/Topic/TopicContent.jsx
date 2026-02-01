@@ -1,21 +1,20 @@
-import { Nav, Button, Image } from "react-bootstrap";
+import { Nav, Button, Image, Modal, Form } from "react-bootstrap"; // ✅ Added Modal, Form
 import { Link, useNavigate } from "react-router-dom";
 import { BsFillTagFill } from "react-icons/bs";
 import { GiPlayButton } from "react-icons/gi";
 import { FaEye } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { reportTopic } from "../../redux/slices/topicSlice";
-import { MdReportProblem } from "react-icons/md";
+import { MdDelete, MdReportProblem } from "react-icons/md"; // ✅ Added Report Icon
 import moment from "moment";
 import {
     deleteTopic,
     toggleDownvoteTopic,
     toggleUpvoteTopic,
+    reportTopic, // ✅ Make sure this action is imported
 } from "../../redux/slices/topicSlice";
 import { useDispatch, useSelector } from "react-redux";
 import PollItem from "./Poll/PollItem";
+import { useState } from "react"; // ✅ Added useState
 
-// Default avatar URL (placeholder)
 const DEFAULT_AVATAR = "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
 const TopicContent = ({ topic, onDeleting }) => {
@@ -26,22 +25,25 @@ const TopicContent = ({ topic, onDeleting }) => {
     const isAuth = !!localStorage.getItem("isLoggedIn");
     const { votingIsLoading, deleteTopicIsLoading } = useSelector((state) => state.topic);
 
+    // ✅ Modal State
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+
     const handleToggleUpvoteTopic = (id) => { dispatch(toggleUpvoteTopic(id)); };
     const handleToggleDownvoteTopic = (id) => { dispatch(toggleDownvoteTopic(id)); };
 
-    // ✅ ROBUST CHECK: Check against author.username OR topic.owner
-    const isOwner = username && (
-        (topic?.author?.username === username) ||
-        (topic?.owner === username)
-    );
-    const handleReport = () => {
-        if (!isAuth) return navigate("/login");
+    // ✅ Handle Report Submission
+    const handleSubmitReport = () => {
+        if (!reportReason.trim()) return alert("Please provide a reason.");
+        dispatch(reportTopic({ id: topic._id, reason: reportReason }));
+        setShowReportModal(false);
+        setReportReason("");
+        alert("Report submitted for review.");
+    };
 
-        const reason = prompt("Why are you reporting this topic?");
-        if (reason && reason.trim().length > 0) {
-            dispatch(reportTopic({ id: topic._id, reason }));
-            alert("Report submitted for review.");
-        }
+    const handleOpenReport = () => {
+        if (!isAuth) return navigate("/login");
+        setShowReportModal(true);
     };
 
     return (
@@ -77,7 +79,6 @@ const TopicContent = ({ topic, onDeleting }) => {
                 <div className="topic-meta d-flex align-items-center">
                     <div className="topic-writer d-flex align-items-center">
                         <Link className="d-flex align-items-center justify-content-center" to={`/user/${topic?.author?.username}`}>
-                            {/* ✅ FIX: Add Fallback for Avatar */}
                             <Image
                                 src={topic?.author?.avatar?.url || DEFAULT_AVATAR}
                                 onError={(e) => e.target.src = DEFAULT_AVATAR}
@@ -94,7 +95,6 @@ const TopicContent = ({ topic, onDeleting }) => {
 
                 <p className="topic-summary">{topic?.content}</p>
 
-                {/* Poll Section */}
                 {topic?.poll && topic.poll.question && (
                     <div className="mb-4">
                         <PollItem poll={topic.poll} topicId={topic._id} />
@@ -114,12 +114,8 @@ const TopicContent = ({ topic, onDeleting }) => {
                     <Nav.Link style={{ pointerEvents: "none" }} className="d-flex align-items-center">
                         <FaEye /> {topic?.viewsCount} views
                     </Nav.Link>
-                    <Nav.Link onClick={handleReport} className="d-flex align-items-center text-warning">
-                        <MdReportProblem /> Report
-                    </Nav.Link>
 
-                    {/* ✅ FIX: Use the robust isOwner check */}
-                    {isOwner && (
+                    {username && topic?.author?.username === username && (
                         <Nav.Link
                             disabled={deleteTopicIsLoading}
                             onClick={() => {
@@ -128,13 +124,45 @@ const TopicContent = ({ topic, onDeleting }) => {
                                     onDeleting();
                                 }
                             }}
-                            className="d-flex align-items-center"
+                            className="d-flex align-items-center text-danger"
                         >
                             <MdDelete /> delete this topic
                         </Nav.Link>
                     )}
+
+                    {/* ✅ Report Button */}
+                    <Nav.Link onClick={handleOpenReport} className="d-flex align-items-center text-warning">
+                        <MdReportProblem /> Report
+                    </Nav.Link>
                 </Nav>
             </div>
+
+            {/* ✅ Report Modal */}
+            <Modal show={showReportModal} onHide={() => setShowReportModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Report Topic</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form.Group>
+                        <Form.Label>Why are you reporting this?</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            rows={3}
+                            placeholder="Spam, harassment, inappropriate content..."
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                        />
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowReportModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={handleSubmitReport}>
+                        Submit Report
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };
