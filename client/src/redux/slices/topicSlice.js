@@ -88,9 +88,6 @@ export const addTopic = createAsyncThunk(
             console.log(data);
             return data;
         } catch (err) {
-	console.log(err);
-
-
             console.log(err);
             return rejectWithValue(err.response.data);
         }
@@ -250,6 +247,7 @@ const topicSlice = createSlice({
             })
 
             // ADD TOPIC
+            // ADD TOPIC
             .addCase(addTopic.pending, (state) => {
                 state.addTopic.isLoading = true;
                 state.addTopic.isSuccess = false;
@@ -260,17 +258,22 @@ const topicSlice = createSlice({
                 state.addTopic.isLoading = false;
                 state.addTopic.isSuccess = true;
                 state.addTopic.isError = false;
-                state.topics.push(action.payload.topic);
-                state.addTopic.message = action.payload.message;
 
-                // ✅ FIX: Change TopicID to _id
-                state.addTopic.newTopicURL = `/topics/${action.payload.topic._id}/${action.payload.topic.slug}`;
+                // ✅ FIX 1: action.payload IS the topic now, so we add it directly.
+                // We use 'unshift' instead of 'push' to show the new topic at the top of the list.
+                state.topics.unshift(action.payload);
+
+                // ✅ FIX 2: Manually set the success message since the backend just sends the topic
+                state.addTopic.message = "Topic created successfully!";
+
+                // ✅ FIX 3: Access _id and slug directly from action.payload
+                state.addTopic.newTopicURL = `/topics/${action.payload._id}/${action.payload.slug}`;
             })
             .addCase(addTopic.rejected, (state, action) => {
                 state.addTopic.isLoading = false;
                 state.addTopic.isSuccess = false;
                 state.addTopic.isError = true;
-                state.addTopic.message = action.payload.message;
+                state.addTopic.message = action.payload?.message || "Something went wrong";
             })
 
 
