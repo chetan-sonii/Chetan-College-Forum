@@ -68,10 +68,10 @@ module.exports = {
   // ✅ THIS IS THE FIXED FUNCTION
   addTopic: async (req, res) => {
     try {
-      const { title, content, space, tags } = req.body;
+      // ✅ FIX 1: Extract 'poll' from req.body
+      const { title, content, space, tags, poll } = req.body;
 
-      // 1. Generate Slug (Required by Schema)
-      // Converts "My New Topic" -> "my-new-topic"
+      // 1. Generate Slug
       const slug = title
           .toLowerCase()
           .replace(/ /g, "-")
@@ -83,9 +83,10 @@ module.exports = {
         content,
         space,
         tags,
-        slug: slug,               // <--- Added missing field
-        owner: req.user.username, // <--- Added missing field (Schema requires a String owner)
-        author: req.user._id,     // Keep author as ObjectId for population
+        slug: slug,
+        owner: req.user.username,
+        author: req.user._id,
+        poll: poll, //
       });
 
       // 3. Populate the author details immediately
