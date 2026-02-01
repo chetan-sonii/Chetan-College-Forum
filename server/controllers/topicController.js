@@ -35,6 +35,9 @@ module.exports = {
 
       return res.status(200).json({ topics, currentPage: pageNum, totalPages, totalTopics });
     } catch (err) {
+	console.log(err);
+
+
       return res.status(500).json({ message: err.message });
     }
   },
@@ -53,6 +56,9 @@ module.exports = {
           .exec();
       return res.status(200).json(topic);
     } catch (err) {
+	console.log(err);
+
+
       console.log(err.message);
     }
   },
@@ -62,26 +68,33 @@ module.exports = {
     try {
       const { title, content, space, tags } = req.body;
 
-      // 1. Create the topic
+      // 1. Generate Slug (Required by Schema)
+      // Converts "My New Topic" -> "my-new-topic"
+      const slug = title
+          .toLowerCase()
+          .replace(/ /g, "-")
+          .replace(/[^\w-]+/g, "");
+
+      // 2. Create the topic
       let newTopic = await Topic.create({
         title,
         content,
         space,
         tags,
-        author: req.user._id, // Ensure we use the authenticated user's ID
+        slug: slug,               // <--- Added missing field
+        owner: req.user.username, // <--- Added missing field (Schema requires a String owner)
+        author: req.user._id,     // Keep author as ObjectId for population
       });
 
-      // 2. CRITICAL STEP: Populate the author details immediately
-      // We must match the same fields selected in getAllTopics
+      // 3. Populate the author details immediately
       newTopic = await newTopic.populate({
         path: "author",
-        select: "firstName lastName username avatar"
+        select: "firstName lastName username avatar",
       });
 
-      // 3. Send the populated topic back to the frontend
       return res.status(201).json(newTopic);
-
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: err.message });
     }
   },
@@ -109,6 +122,9 @@ module.exports = {
 
       return res.status(200).json({ poll: topic.poll, topicId: id, message: "Vote registered!" });
     } catch (err) {
+	console.log(err);
+
+
 
       return res.status(500).json({ message: err.message });
     }
@@ -135,6 +151,9 @@ module.exports = {
       await Topic.findByIdAndDelete(id);
       return res.json({ topicId: id, message: "Topic deleted successfully!" });
     } catch (err) {
+	console.log(err);
+
+
       console.log(err.message);
     }
   },
@@ -166,6 +185,9 @@ module.exports = {
         });
       }
     } catch (err) {
+	console.log(err);
+
+
       return res.status(403).json({
         Error: err.message,
       });
@@ -199,6 +221,9 @@ module.exports = {
         });
       }
     } catch (err) {
+	console.log(err);
+
+
       return res.status(403).json({
         Error: err.message,
       });
@@ -223,6 +248,9 @@ module.exports = {
       ]);
       return res.status(200).json(topContributors);
     } catch (err) {
+	console.log(err);
+
+
       console.log(err.message);
     }
   },
@@ -231,6 +259,9 @@ module.exports = {
       const spaces = await Space.find({});
       return res.status(200).json(spaces);
     } catch (err) {
+	console.log(err);
+
+
       console.log(err.message);
     }
   },

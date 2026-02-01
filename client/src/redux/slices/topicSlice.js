@@ -45,6 +45,9 @@ export const getAllTopics = createAsyncThunk(
             });
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -60,6 +63,9 @@ export const getTopic = createAsyncThunk(
             return data;
 
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -82,6 +88,9 @@ export const addTopic = createAsyncThunk(
             console.log(data);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             console.log(err);
             return rejectWithValue(err.response.data);
         }
@@ -102,6 +111,9 @@ export const voteOnPoll = createAsyncThunk(
             console.log(optionIndex);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             console.log(err);
             return rejectWithValue(err.response.data);
         }
@@ -118,6 +130,9 @@ export const deleteTopic = createAsyncThunk(
             const { data } = await axios.delete(`/api/topics/${id}`);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -130,6 +145,9 @@ export const toggleUpvoteTopic = createAsyncThunk(
             const { data } = await axios.post(`/api/topics/${id}/upvote`);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -142,6 +160,9 @@ export const toggleDownvoteTopic = createAsyncThunk(
             const { data } = await axios.post(`/api/topics/${id}/downvote`);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -154,6 +175,9 @@ export const getTopContributors = createAsyncThunk(
             const { data } = await axios.get(`/api/topics/contributors`);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -166,6 +190,9 @@ export const getSpaces = createAsyncThunk(
             const { data } = await axios.get(`/api/topics/spaces`);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
@@ -406,6 +433,9 @@ export const getUserTopics = createAsyncThunk(
             const { data } = await axios.get(`/api/user/${username}/topics`);
             return data;
         } catch (err) {
+	console.log(err);
+
+
             return rejectWithValue(err.response.data);
         }
     }
