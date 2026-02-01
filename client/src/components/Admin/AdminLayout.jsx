@@ -2,7 +2,8 @@ import { Outlet, Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Nav, Button } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { adminLogout } from "../../redux/slices/adminSlice";
-import { MdDashboard, MdPeople, MdTag, MdLogout } from "react-icons/md";
+import {MdDashboard, MdPeople, MdTag, MdLogout, MdComment, MdReportProblem} from "react-icons/md";
+
 
 const AdminLayout = () => {
     const dispatch = useDispatch();
@@ -28,6 +29,12 @@ const AdminLayout = () => {
                         </Nav.Link>
                         <Nav.Link as={Link} to="/admin/tags" className="text-white-50 hover-white">
                             <MdTag className="me-2" /> Tags
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/admin/comments" className="text-white-50 hover-white">
+                            <MdComment className="me-2" /> Comments
+                        </Nav.Link>
+                        <Nav.Link as={Link} to="/admin/reports" className="text-white-50 hover-white">
+                            <MdReportProblem className="me-2" /> Reports
                         </Nav.Link>
                     </Nav>
 

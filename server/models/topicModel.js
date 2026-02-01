@@ -16,6 +16,13 @@ const topicSchema = new mongoose.Schema(
         upvotes: [{ type: String }],
         downvotes: [{ type: String }],
         author: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        reports: [
+            {
+                reporter: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+                reason: { type: String, required: true },
+                createdAt: { type: Date, default: Date.now }
+            }
+        ],
 
         poll: {
             question: { type: String },

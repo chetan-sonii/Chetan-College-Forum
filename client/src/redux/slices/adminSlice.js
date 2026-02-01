@@ -5,9 +5,7 @@ import axios from "../../utils/axios";
 
 const attachToken = () => {
     const token = localStorage.getItem("adminToken");
-    if (token) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
+    if (token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 };
 // Helper to set token
 const setAdminToken = (token) => {
@@ -27,8 +25,11 @@ export const adminLogin = createAsyncThunk(
             const { data } = await axios.post("/api/admin/login", userData);
             setAdminToken(data.access_token); // Set header immediately
             localStorage.setItem("adminInfo", JSON.stringify(data.admin));
-            return data;
+            console.log(data);
+return data;
+
         } catch (err) {
+console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
@@ -43,8 +44,11 @@ export const getAdminStats = createAsyncThunk(
             if(token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
             const { data } = await axios.get("/api/admin/stats");
-            return data;
+            console.log(data);
+return data;
+
         } catch (err) {
+console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
@@ -57,8 +61,11 @@ export const getAdminUsers = createAsyncThunk(
         try {
             attachToken(); // ✅ Ensure token is attached before request
             const { data } = await axios.get(`/api/admin/users?search=${searchQuery}`);
-            return data;
+            console.log(data);
+return data;
+
         } catch (err) {
+console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
@@ -71,13 +78,67 @@ export const manageUser = createAsyncThunk(
         try {
             attachToken(); // ✅ Ensure token is attached
             const { data } = await axios.post(`/api/admin/users/${id}/manage`, { action });
-            return data;
+            console.log(data);
+return data;
+
         } catch (err) {
+console.log(err);
             return rejectWithValue(err.response.data);
         }
     }
 );
+// === TAG THUNKS ===
+export const getAdminTags = createAsyncThunk("admin/getTags", async (_, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.get("/api/admin/tags"); console.log(data);
+return data;
+ }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
 
+export const createAdminTag = createAsyncThunk("admin/createTag", async (tagData, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.post("/api/admin/tags", tagData); console.log(data);
+return data;
+ }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
+
+export const deleteAdminTag = createAsyncThunk("admin/deleteTag", async (id, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.delete(`/api/admin/tags/${id}`); return { id }; }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
+
+// === COMMENT THUNKS ===
+export const getAdminComments = createAsyncThunk("admin/getComments", async (_, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.get("/api/admin/comments"); console.log(data);
+return data;
+ }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
+
+export const deleteAdminComment = createAsyncThunk("admin/deleteComment", async (id, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.delete(`/api/admin/comments/${id}`); return { id }; }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
+
+// === REPORTS THUNKS ===
+export const getAdminReports = createAsyncThunk("admin/getReports", async (_, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.get("/api/admin/reports"); console.log(data);
+return data;
+ }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
+
+export const dismissAdminReports = createAsyncThunk("admin/dismissReports", async (id, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.put(`/api/admin/reports/${id}/dismiss`); console.log(data);
+return data;
+ }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
+
+export const deleteAdminTopic = createAsyncThunk("admin/deleteTopic", async (id, { rejectWithValue }) => {
+    try { attachToken(); const { data } = await axios.delete(`/api/admin/reports/${id}/delete`); return { id }; }
+    catch (err) { return rejectWithValue(err.response.data); }
+});
 const adminSlice = createSlice({
     name: "admin",
     initialState: {
@@ -88,6 +149,11 @@ const adminSlice = createSlice({
         error: null,
         usersList: [],
         usersLoading: false,
+        tagsList: [],
+        commentsList: [],
+        loadingResource: false,
+        reportsList: [],
+        reportsLoading: false,
     },
     reducers: {
         adminLogout: (state) => {
@@ -135,6 +201,39 @@ const adminSlice = createSlice({
                     const user = state.usersList.find(u => u._id === userId);
                     if (user) user.isBanned = false;
                 }
+            })
+
+
+            // Tags
+            .addCase(getAdminTags.fulfilled, (state, action) => { state.tagsList = action.payload; })
+            .addCase(createAdminTag.fulfilled, (state, action) => { state.tagsList.unshift(action.payload); })
+            .addCase(deleteAdminTag.fulfilled, (state, action) => {
+                state.tagsList = state.tagsList.filter(t => t._id !== action.payload.id);
+            })
+
+            // Comments
+            .addCase(getAdminComments.pending, (state) => { state.loadingResource = true; })
+            .addCase(getAdminComments.fulfilled, (state, action) => {
+                state.loadingResource = false;
+                state.commentsList = action.payload;
+            })
+            .addCase(deleteAdminComment.fulfilled, (state, action) => {
+                state.commentsList = state.commentsList.filter(c => c._id !== action.payload.id);
+            })
+
+            // Reports
+            .addCase(getAdminReports.pending, (state) => { state.reportsLoading = true; })
+            .addCase(getAdminReports.fulfilled, (state, action) => {
+                state.reportsLoading = false;
+                state.reportsList = action.payload;
+            })
+
+            // Remove from list if Dismissed OR Deleted
+            .addCase(dismissAdminReports.fulfilled, (state, action) => {
+                state.reportsList = state.reportsList.filter(item => item._id !== action.payload.id);
+            })
+            .addCase(deleteAdminTopic.fulfilled, (state, action) => {
+                state.reportsList = state.reportsList.filter(item => item._id !== action.payload.id);
             });
     },
 });

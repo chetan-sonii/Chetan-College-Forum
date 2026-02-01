@@ -132,6 +132,7 @@ export const reportTopic = createAsyncThunk(
             const { data } = await axios.post(`/api/topics/${id}/report`, { reason });
             return data;
         } catch (err) {
+            console.log(err);
             return rejectWithValue(err.response.data);
         }
     }

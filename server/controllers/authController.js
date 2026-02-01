@@ -90,6 +90,11 @@ module.exports = {
           message: "You must activate your account before you can login!",
         });
       }
+      if (userExisted.isBanned) {
+        return res.status(403).json({
+          message: "Your account has been banned. Please contact support."
+        });
+      }
       const accessToken = generateAccessToken(userExisted);
       const refreshToken = generateRefreshToken(
         userExisted,

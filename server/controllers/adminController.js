@@ -6,6 +6,7 @@ const Tag = require("../models/tagModel");
 const bcrypt = require("bcrypt");
 const { createAccessToken } = require("../middlewares/generateTokens");
 
+
 module.exports = {
     // 1. Admin Login
     loginAdmin: async (req, res) => {
@@ -175,6 +176,109 @@ module.exports = {
 
             return res.status(400).json({ message: "Invalid action" });
 
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    },
+    getAllTags: async (req, res) => {
+        try {
+            const tags = await Tag.find().sort({ count: -1 }); // Sort by usage count
+            res.json(tags);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    },
+
+    createTag: async (req, res) => {
+        try {
+            const { name, color } = req.body;
+            const existing = await Tag.findOne({ name: name.toLowerCase() });
+            if (existing) return res.status(400).json({ message: "Tag already exists" });
+
+            const newTag = await Tag.create({
+                name: name.toLowerCase(),
+                color: color || "#343a40" // Default dark color
+            });
+            res.status(201).json(newTag);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    },
+
+    deleteTag: async (req, res) => {
+        try {
+            await Tag.findByIdAndDelete(req.params.id);
+            res.json({ message: "Tag deleted", id: req.params.id });
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    },
+
+    // === COMMENTS MODERATION (Useful Tab) ===
+    getAllComments: async (req, res) => {
+        try {
+            // Fetch latest 50 comments for moderation
+            const comments = await Comment.find()
+                .populate("author", "username avatar") // Changed from "user" to "author" based on your schema usage
+                .populate("parentTopic", "title")
+                .sort({ createdAt: -1 })
+                .limit(50);
+            res.json(comments);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    },
+
+    deleteComment: async (req, res) => {
+        try {
+            await Comment.findByIdAndDelete(req.params.id);
+            // Optional: Decrement topic comment count here if strict consistency needed
+            res.json({ message: "Comment deleted", id: req.params.id });
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
+    },
+    // === REPORT MANAGEMENT ===
+    getReportedContent: async (req, res) => {
+        try {
+            // Find topics where reports array is not empty
+            const topics = await Topic.find({ reports: { $exists: true, $not: { $size: 0 } } })
+                .populate("reports.reporter", "username avatar") // Get reporter details
+                .populate("author", "username firstName lastName") // Get topic author
+                .sort({ "reports.createdAt": -1 }); // Newest reports first
+
+            res.json(topics);
+        } catch (err) {
+
+            return res.status(500).json({ message: err.message });
+        }
+    },
+
+    dismissReports: async (req, res) => {
+        try {
+            const { id } = req.params; // Topic ID
+            const topic = await Topic.findById(id);
+
+            if (!topic) return res.status(404).json({ message: "Topic not found" });
+
+            // Clear the reports array
+            topic.reports = [];
+            await topic.save();
+
+            return res.json({ message: "Reports dismissed", id });
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    },
+
+    deleteTopicByAdmin: async (req, res) => {
+        try {
+            const { id } = req.params;
+            await Topic.findByIdAndDelete(id);
+            // Clean up associated comments
+            await Comment.deleteMany({ parentTopic: id });
+
+            return res.json({ message: "Topic deleted by Admin", id });
         } catch (err) {
             return res.status(500).json({ message: err.message });
         }

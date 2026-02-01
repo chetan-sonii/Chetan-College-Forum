@@ -5,7 +5,7 @@ import {
   Route,
   Navigate,
   Outlet,
-} from "react-router-dom"; //
+} from "react-router-dom";
 import { useEffect } from "react";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -31,18 +31,15 @@ import "./Responsive.css";
 import { useSelector } from "react-redux";
 import axios from "./utils/axios";
 
+
 // ✅ Admin Imports
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminLayout from "./components/Admin/AdminLayout";
 import Dashboard from "./pages/Admin/Dashboard";
 import UsersTable from "./pages/Admin/UsersTable";
-useEffect(() => {
-  const adminToken = localStorage.getItem("adminToken");
-  if (adminToken) {
-    // Restore the token to Axios headers so requests don't fail
-    axios.defaults.headers.common["Authorization"] = `Bearer ${adminToken}`;
-  }
-}, []);
+import TagsTable from "./pages/Admin/TagsTable";
+import CommentsTable from "./pages/Admin/CommentsTable";
+import ReportsTable from "./pages/Admin/ReportsTable";
 
 // ✅ 1. Create a Layout for the Main Website (Includes Header)
 const MainLayout = () => {
@@ -58,6 +55,15 @@ const App = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
   const isAuth = !!localStorage.getItem("isLoggedIn");
 
+  // ✅ FIX: useEffect moved INSIDE the component
+  useEffect(() => {
+    const adminToken = localStorage.getItem("adminToken");
+    if (adminToken) {
+      // Restore the token to Axios headers so requests don't fail
+      axios.defaults.headers.common["Authorization"] = `Bearer ${adminToken}`;
+    }
+  }, []);
+
   return (
       <Router>
         <Routes>
@@ -69,13 +75,12 @@ const App = () => {
           <Route path="/admin/login" element={<AdminLogin />} />
 
           {/* Protected Admin Dashboard */}
-          {/* AdminLayout already handles the check for adminToken.
-            If a regular user tries to go here, they will be redirected to Admin Login
-            because they lack the admin token. */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<UsersTable />} />
-            {/* Add future admin tabs here (Users, Tags) */}
+            <Route path="tags" element={<TagsTable />} />
+            <Route path="comments" element={<CommentsTable />} />
+            <Route path="reports" element={<ReportsTable />} />
           </Route>
 
 
@@ -120,6 +125,8 @@ const App = () => {
               <Route path="comments" element={<CommentsTab />} />
               <Route path="following" element={<FollowingTab />} />
               <Route path="followers" element={<FollowersTab />} />
+              {/* Note: Ensure 'saved' route is added here if you implemented SavedTab */}
+              {/* <Route path="saved" element={<SavedTab />} /> */}
             </Route>
 
             <Route
