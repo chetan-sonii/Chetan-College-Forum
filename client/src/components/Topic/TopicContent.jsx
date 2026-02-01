@@ -11,8 +11,10 @@ import {
     toggleUpvoteTopic,
 } from "../../redux/slices/topicSlice";
 import { useDispatch, useSelector } from "react-redux";
-// ✅ IMPORT THIS
 import PollItem from "./Poll/PollItem";
+
+// Default avatar URL (placeholder)
+const DEFAULT_AVATAR = "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
 const TopicContent = ({ topic, onDeleting }) => {
     const dispatch = useDispatch();
@@ -24,6 +26,12 @@ const TopicContent = ({ topic, onDeleting }) => {
 
     const handleToggleUpvoteTopic = (id) => { dispatch(toggleUpvoteTopic(id)); };
     const handleToggleDownvoteTopic = (id) => { dispatch(toggleDownvoteTopic(id)); };
+
+    // ✅ ROBUST CHECK: Check against author.username OR topic.owner
+    const isOwner = username && (
+        (topic?.author?.username === username) ||
+        (topic?.owner === username)
+    );
 
     return (
         <>
@@ -58,9 +66,11 @@ const TopicContent = ({ topic, onDeleting }) => {
                 <div className="topic-meta d-flex align-items-center">
                     <div className="topic-writer d-flex align-items-center">
                         <Link className="d-flex align-items-center justify-content-center" to={`/user/${topic?.author?.username}`}>
-                            {/* ✅ Safe Check for Avatar */}
-                            <Image src={topic?.author?.avatar?.url} />
-                            {/* ✅ Safe Check for Name */}
+                            {/* ✅ FIX: Add Fallback for Avatar */}
+                            <Image
+                                src={topic?.author?.avatar?.url || DEFAULT_AVATAR}
+                                onError={(e) => e.target.src = DEFAULT_AVATAR}
+                            />
                             <h5 className="writer">
                                 {topic?.author ? `${topic.author.firstName} ${topic.author.lastName}` : "Unknown User"}
                             </h5>
@@ -73,7 +83,7 @@ const TopicContent = ({ topic, onDeleting }) => {
 
                 <p className="topic-summary">{topic?.content}</p>
 
-                {/* ✅ RENDER POLL HERE */}
+                {/* Poll Section */}
                 {topic?.poll && topic.poll.question && (
                     <div className="mb-4">
                         <PollItem poll={topic.poll} topicId={topic._id} />
@@ -93,7 +103,9 @@ const TopicContent = ({ topic, onDeleting }) => {
                     <Nav.Link style={{ pointerEvents: "none" }} className="d-flex align-items-center">
                         <FaEye /> {topic?.viewsCount} views
                     </Nav.Link>
-                    {username && topic?.author?.username === username && (
+
+                    {/* ✅ FIX: Use the robust isOwner check */}
+                    {isOwner && (
                         <Nav.Link
                             disabled={deleteTopicIsLoading}
                             onClick={() => {

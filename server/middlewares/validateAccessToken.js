@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel"); //
 
-const validateAccessToken = (req, res, next) => {
+// Make the function async to allow database calls
+const validateAccessToken = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
@@ -17,11 +19,20 @@ const validateAccessToken = (req, res, next) => {
             process.env.ACCESS_TOKEN_SECRET_KEY
         );
 
-        // decoded is guaranteed here
-        const { username, email } = decoded;
+        const { email } = decoded;
 
-        req.user = { username, email }; // REQUIRED for topicController
-        next(); // ✅ safe
+        // CRITICAL FIX: Fetch the user from DB to get the _id
+        const user = await User.findOne({ email }).select("-password");
+
+        if (!user) {
+            return res.status(401).json({
+                message: "User belonging to this token no longer exists.",
+            });
+        }
+
+        // Now req.user contains the full user object, including _id
+        req.user = user;
+        next();
     } catch (err) {
         if (err.name === "TokenExpiredError") {
             return res.status(401).json({

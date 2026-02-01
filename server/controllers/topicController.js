@@ -50,10 +50,12 @@ module.exports = {
           { $inc: { viewsCount: 1 } },
           { returnOriginal: false }
       )
-          .populate('author', 'firstName lastName')
+          .populate('author', 'firstName lastName username avatar')
           .populate('space', 'name')
           .lean()
           .exec();
+      console.log(topic);
+      console.log("\n\n\n\n\n\n");
       return res.status(200).json(topic);
     } catch (err) {
 	console.log(err);
