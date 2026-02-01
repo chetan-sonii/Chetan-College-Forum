@@ -1,5 +1,5 @@
 import { useMemo, memo, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import {Link, useLocation, useParams} from "react-router-dom";
 import { Button, Image, Nav } from "react-bootstrap";
 import { MdEdit } from "react-icons/md";
 import {
@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserProfile } from "../../redux/slices/profileSlice";
 import FollowButton from "./FollowButton";
 import SkeletonProfileHeader from "../Skeletons/SkeletonProfileHeader";
+import {BsBookmarkFill} from "react-icons/bs";
 
 const ProfileHeader = memo(() => {
   const { username } = useParams();
@@ -23,7 +24,10 @@ const ProfileHeader = memo(() => {
     (state) => state.profile
   );
   const loggedUser = JSON.parse(localStorage.getItem("user"))?.username;
-
+  const isOwner = loggedUser === username;
+  const location = useLocation();
+  const pathPart = location.pathname.split("/").pop();
+  const activeKey = pathPart === username ? "topics" : pathPart;
   useEffect(() => {
     if (username) document.title = `${username} Profile | CHETAN Forum`;
   }, [username]);
@@ -153,6 +157,18 @@ const ProfileHeader = memo(() => {
                 </div>
                 Followers
               </Nav.Link>
+              {isOwner && (
+                  <Nav.Link
+                      as={Link}
+                      to={`/user/${userProfile?.username}/saved`}
+                      eventKey="saved"
+                      className="d-flex align-items-center"
+                  >
+                    <div className="d-flex icon-container"><BsBookmarkFill /></div>
+                    Saved
+                  </Nav.Link>
+              )}
+
             </Nav>
           </div>
         </div>

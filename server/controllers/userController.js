@@ -262,4 +262,76 @@ module.exports = {
       return res.status(500).json({ message: err.message });
     }
   },
+  toggleSaveTopic: async (req, res) => {
+    try {
+      const { id } = req.params; // The Topic ID
+      const user = await User.findById(req.user._id);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if topic is already saved
+      const isSaved = user.savedTopics.includes(id);
+
+      if (isSaved) {
+        // Remove it ($pull)
+        user.savedTopics.pull(id);
+        await user.save();
+        return res.status(200).json({
+          message: "Topic removed from bookmarks",
+          savedTopics: user.savedTopics,
+          type: "removed"
+        });
+      } else {
+        // Add it ($push)
+        user.savedTopics.push(id);
+        await user.save();
+        return res.status(200).json({
+          message: "Topic saved to bookmarks",
+          savedTopics: user.savedTopics,
+          type: "added"
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
+  getSavedTopics: async (req, res) => {
+    try {
+      const user = await User.findById(req.user._id).populate({
+        path: "savedTopics",
+        populate: [
+          { path: "author", select: "firstName lastName username avatar" },
+          { path: "tags" },
+          { path: "space" }
+        ],
+        options: { sort: { createdAt: -1 } } // Sort by newest
+      });
+
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      return res.status(200).json(user.savedTopics);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
+  getUpvotedTopics: async (req, res) => {
+    try {
+      const { username } = req.params;
+      // Find topics where the 'upvotes' array includes the username
+      // We assume 'upvotes' stores usernames (strings) based on your Topic Model
+      const Topic = require("../models/topicModel"); // Ensure Topic is imported inside or at top
+
+      const topics = await Topic.find({ upvotes: username })
+          .populate("author", "firstName lastName username avatar")
+          .populate("space", "name")
+          .populate("tags")
+          .sort({ createdAt: -1 }); // Newest upvoted first? Or newest created? Usually creation time.
+
+      return res.status(200).json(topics);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  },
 };

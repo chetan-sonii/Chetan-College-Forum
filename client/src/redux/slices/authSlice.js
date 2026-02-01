@@ -104,6 +104,9 @@ return data;
     }
 );
 
+
+
+
 export const refresh_token = createAsyncThunk(
     "auth/refresh_token",
     async (_, { rejectWithValue }) => {
@@ -135,7 +138,17 @@ return data;
     }
 );
 
-
+export const toggleSaveTopic = createAsyncThunk(
+    "auth/toggleSaveTopic",
+    async (topicId, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.post(`/api/user/save/${topicId}`);
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
 
 export const sendEmailVerification = createAsyncThunk(
     "auth/sendEmailVerification",
@@ -438,7 +451,24 @@ const authSlice = createSlice({
                 state.resetPassword.isSuccess = false;
                 state.resetPassword.message =
                     action.payload?.message || action.error?.message || "Failed";
+            })
+
+
+            .addCase(toggleSaveTopic.fulfilled, (state, action) => {
+                // Update the user's savedTopics array in the state immediately
+                state.user.savedTopics = action.payload.savedTopics;
+
+                // Optional: Update localStorage to persist state across reloads if you use it there
+                const lsUser = JSON.parse(localStorage.getItem("user"));
+                if (lsUser) {
+                    lsUser.savedTopics = action.payload.savedTopics;
+                    localStorage.setItem("user", JSON.stringify(lsUser));
+                }
             });
+
+
+
+        ;
     },
 });
 

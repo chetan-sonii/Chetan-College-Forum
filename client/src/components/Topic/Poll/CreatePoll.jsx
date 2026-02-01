@@ -10,13 +10,16 @@ const CreatePoll = ({ onPollChange }) => {
 
     useEffect(() => {
         const validOptions = options.map(o => o.trim()).filter(Boolean);
-        if (question.trim() && validOptions.length >= 2) {
-            onPollChange({ question: question.trim(), options: validOptions, duration });
-        } else {
-            onPollChange(null);
+
+        // ✅ FIX: Check if onPollChange is a function before calling
+        if (typeof onPollChange === "function") {
+            if (question.trim() && validOptions.length >= 2) {
+                onPollChange({ question: question.trim(), options: validOptions, duration });
+            } else {
+                onPollChange(null);
+            }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [question, options, duration]);
+    }, [question, options, duration, onPollChange]);
 
     const handleOptionChange = (index, value) => {
         setOptions(prev => {
@@ -52,7 +55,6 @@ const CreatePoll = ({ onPollChange }) => {
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         className="createpoll-question"
-                        aria-label="Poll question"
                     />
                     <Form.Text className="createpoll-help">Keep it short — voters skim.</Form.Text>
                 </Form.Group>
@@ -62,22 +64,21 @@ const CreatePoll = ({ onPollChange }) => {
 
                     <div className="d-flex flex-column createpoll-options">
                         {options.map((opt, idx) => (
-                            <div key={idx} className="d-flex align-items-center createpoll-option-row">
-                                <div className="createpoll-index" aria-hidden>{idx + 1}</div>
+                            <div key={idx} className="d-flex align-items-center createpoll-option-row mb-2">
+                                <div className="createpoll-index me-2" aria-hidden>{idx + 1}</div>
 
-                                <input
-                                    className="form-control createpoll-option-input"
+                                <Form.Control
+                                    className="createpoll-option-input"
                                     type="text"
                                     placeholder={`Option ${idx + 1}`}
                                     value={opt}
                                     onChange={(e) => handleOptionChange(idx, e.target.value)}
-                                    aria-label={`Option ${idx + 1}`}
                                 />
 
                                 {options.length > 2 ? (
                                     <Button
                                         variant="link"
-                                        className="createpoll-remove-btn"
+                                        className="createpoll-remove-btn text-danger ms-2"
                                         onClick={() => removeOption(idx)}
                                         title={`Remove option ${idx + 1}`}
                                     >
@@ -95,9 +96,9 @@ const CreatePoll = ({ onPollChange }) => {
                     <Col xs={12} md={6}>
                         {options.length < 5 ? (
                             <Button
+                                variant="outline-primary"
                                 className="createpoll-add-btn d-inline-flex align-items-center gap-1"
                                 onClick={addOption}
-                                aria-label="Add option"
                             >
                                 <IoMdAdd size={16} /> Add option
                             </Button>
@@ -114,8 +115,8 @@ const CreatePoll = ({ onPollChange }) => {
                                 size="sm"
                                 value={duration}
                                 onChange={(e) => setDuration(Number(e.target.value))}
-                                aria-label="Poll duration"
                                 className="createpoll-select"
+                                style={{ width: "auto" }}
                             >
                                 <option value={1}>1 Day</option>
                                 <option value={3}>3 Days</option>

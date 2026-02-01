@@ -9,6 +9,10 @@ const initialState = {
   profileIsLoading: false,
   commentsIsLoading: false,
   followIsLoading: false,
+  savedTopics: [],
+    savedTopicsLoading: false,
+    userUpvotedTopics: [],
+    upvotedTopicsLoading: false,
 };
 
 // ✅ DEFINE THE THUNK HERE
@@ -21,6 +25,31 @@ export const toggleUserFollow = createAsyncThunk(
             return { updatedCurrentUser: data, followedUsername: username };
         } catch (err) {
             return rejectWithValue(err.response?.data || { message: err.message });
+        }
+    }
+);
+
+
+export const getSavedTopics = createAsyncThunk(
+    "profile/getSavedTopics",
+    async (_, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get("/api/user/saved-topics");
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
+
+export const getUserUpvotedTopics = createAsyncThunk(
+    "profile/getUserUpvotedTopics",
+    async (username, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(`/api/users/${username}/upvoted`);
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
         }
     }
 );
@@ -157,6 +186,30 @@ const profileSlice = createSlice({
         .addCase(getUserFollowers.rejected, (state) => {
           state.followIsLoading = false;
         })
+
+        // BookMarks
+          .addCase(getSavedTopics.pending, (state) => {
+              state.savedTopicsLoading = true;
+          })
+          .addCase(getSavedTopics.fulfilled, (state, action) => {
+              state.savedTopicsLoading = false;
+              state.savedTopics = action.payload;
+          })
+          .addCase(getSavedTopics.rejected, (state) => {
+              state.savedTopicsLoading = false;
+          })
+        .addCase(getUserUpvotedTopics.pending, (state) => {
+            state.upvotedTopicsLoading = true;
+        })
+        .addCase(getUserUpvotedTopics.fulfilled, (state, action) => {
+            state.upvotedTopicsLoading = false;
+            state.userUpvotedTopics = action.payload;
+        })
+        .addCase(getUserUpvotedTopics.rejected, (state) => {
+            state.upvotedTopicsLoading = false;
+        });
+
+
 
   },
 });

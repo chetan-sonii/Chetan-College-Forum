@@ -1,29 +1,35 @@
 import { Button, Nav, Image } from "react-bootstrap";
-import { Link, useParams } from "react-router-dom"; // ✅ Import useParams
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { GiPlayButton } from "react-icons/gi";
 import { SiGooglemessages } from "react-icons/si";
 import { FaEye } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    toggleUpvoteTopic,
-    toggleDownvoteTopic,
-} from "../../redux/slices/topicSlice";
+import { toggleUpvoteTopic, toggleDownvoteTopic } from "../../redux/slices/topicSlice";
 import moment from "moment";
-import { useNavigate } from "react-router-dom";
 import PollItem from "./Poll/PollItem";
+import DOMPurify from "dompurify"; // ✅ Import DOMPurify
 
 const DEFAULT_AVATAR = "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
 const TopicItem = ({ topic }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { space } = useParams(); // ✅ Get current space from URL
-    const username = JSON.parse(localStorage.getItem("user"))?.username;
+    const { space } = useParams();
+
+    const { user } = useSelector((state) => state.auth); // Use Redux user for consistency
     const isAuth = !!localStorage.getItem("isLoggedIn");
     const { votingIsLoading } = useSelector((state) => state.topic);
 
     const handleToggleUpvoteTopic = (id) => { dispatch(toggleUpvoteTopic(id)); };
     const handleToggleDownvoteTopic = (id) => { dispatch(toggleDownvoteTopic(id)); };
+
+    // ✅ Helper to Strip Tags
+    const getPreviewText = (htmlContent) => {
+        if (!htmlContent) return "";
+        const cleanHTML = DOMPurify.sanitize(htmlContent);
+        const doc = new DOMParser().parseFromString(cleanHTML, "text/html");
+        return doc.body.textContent || "";
+    };
 
     return (
         <article className="topic-item">
@@ -34,11 +40,11 @@ const TopicItem = ({ topic }) => {
                         if (!isAuth) navigate("/login");
                         if (isAuth) handleToggleUpvoteTopic(topic._id);
                     }}
-                    className={username && topic?.upvotes?.includes(username) ? "upvoted" : ""}
+                    className={user?.username && topic?.upvotes?.includes(user?.username) ? "upvoted" : ""}
                 >
                     <GiPlayButton />
                 </Button>
-                <span className={`votes ${username && topic?.upvotes?.includes(username) ? "upvoted" : ""} ${username && topic?.downvotes?.includes(username) ? "downvoted" : ""}`}>
+                <span className={`votes ${user?.username && topic?.upvotes?.includes(user?.username) ? "upvoted" : ""} ${user?.username && topic?.downvotes?.includes(user?.username) ? "downvoted" : ""}`}>
             {topic?.upvotes?.length - topic?.downvotes?.length}
           </span>
                 <Button
@@ -47,7 +53,7 @@ const TopicItem = ({ topic }) => {
                         if (!isAuth) navigate("/login");
                         if (isAuth) handleToggleDownvoteTopic(topic._id);
                     }}
-                    className={username && topic?.downvotes?.includes(username) ? "downvoted" : ""}
+                    className={user?.username && topic?.downvotes?.includes(user?.username) ? "downvoted" : ""}
                 >
                     <GiPlayButton />
                 </Button>
@@ -57,7 +63,6 @@ const TopicItem = ({ topic }) => {
                     {topic?.tags?.length > 0 &&
                         topic?.tags?.map((tag, i) => (
                             <Nav.Item key={i} as="li">
-                                {/* ✅ FIX: Smart Link that preserves Space */}
                                 <Nav.Link
                                     as={Link}
                                     to={space ? `/space/${space}?tag=${tag?.name}` : `/?tag=${tag?.name}`}
@@ -70,7 +75,12 @@ const TopicItem = ({ topic }) => {
                 <Link to={`/topics/${topic?._id}/${topic?.slug}`}>
                     <h4 className="topic-title">{topic?.title}</h4>
                 </Link>
-                <p className="topic-summary">{topic?.content}</p>
+
+                {/* ✅ FIX: Display Plain Text Preview */}
+                <p className="topic-summary">
+                    {getPreviewText(topic?.content).substring(0, 150)}
+                    {getPreviewText(topic?.content).length > 150 && "..."}
+                </p>
 
                 {topic.poll && topic.poll.question && (
                     <PollItem poll={topic.poll} topicId={topic._id} />

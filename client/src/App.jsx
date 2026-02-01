@@ -27,6 +27,7 @@ import "./App.css";
 import "./poll.css";
 import "./Responsive.css";
 import { useSelector } from "react-redux";
+import SavedTab from "./components/Profile/Tabs/SavedTab";
 
 const App = () => {
   // We keep the useSelector to ensure the component re-renders when Redux auth state changes
@@ -74,6 +75,7 @@ const App = () => {
             <Route path="comments" element={<CommentsTab />} />
             <Route path="following" element={<FollowingTab />} />
             <Route path="followers" element={<FollowersTab />} />
+            <Route path="saved" element={<SavedTab />} />
           </Route>
           <Route
               path="/user/:username/edit"
