@@ -61,7 +61,8 @@ export const login = createAsyncThunk(
     async ({ email, password }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post("/login", { email, password });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -73,7 +74,8 @@ export const logout = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const { data } = await axios.post("/logout");
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -94,7 +96,8 @@ export const register = createAsyncThunk(
                 firstName,
                 lastName,
             });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -106,7 +109,8 @@ export const refresh_token = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const { data } = await axios.get("/refresh_token");
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -123,7 +127,8 @@ export const updateUserProfile = createAsyncThunk(
                     "Content-Type": "multipart/form-data",
                 },
             });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -137,7 +142,8 @@ export const sendEmailVerification = createAsyncThunk(
     async ({ email }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post("/send-email-verification", { email });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -149,7 +155,8 @@ export const emailVerify = createAsyncThunk(
     async ({ token }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post("/verify-email", { token });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -165,7 +172,8 @@ export const resetPassword = createAsyncThunk(
                 newPassword,
                 confirmNewPassword,
             });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }
@@ -177,7 +185,8 @@ export const forgotPassword = createAsyncThunk(
     async ({ email }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post("/forgot-password", { email });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(safeReject(err));
         }

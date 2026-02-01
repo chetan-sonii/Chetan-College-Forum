@@ -7,24 +7,34 @@ import { resetUserProfile } from "../redux/slices/profileSlice";
 import RightSidebar from "../components/RightSidebar/RightSidebar";
 import LeftSidebar from "../components/LeftSidebar/LeftSidebar";
 import SkeletonTopicItem from "../components/Skeletons/SkeletonTopicItem";
-import { useParams } from "react-router-dom";
+import { useParams,useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination/Pagination";
 
 const Home = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const { space } = useParams();
   const { topics, getAllTopicsIsLoading, totalPages, currentPage } = useSelector((state) => state.topic);
   const { sortOption, searchQuery } = useSelector((state) => state.topic);
   const [page, setPage] = useState(1);
+  const spaceQuery = searchParams.get("space");
+  const tagQuery = searchParams.get("tag");
 
   useEffect(() => {
     document.title = space ? `${space} Space | CHETAN Forum` : "Home | CHETAN Forum";
   }, [space]);
 
   useEffect(() => {
-    dispatch(resetUserProfile());
-    dispatch(getAllTopics({ sortOption, searchQuery, space, page }));
-  }, [dispatch, sortOption, searchQuery, space, page]);
+    dispatch(
+        getAllTopics({
+          sortOption,
+          searchQuery,
+          space: spaceQuery,
+          tag: tagQuery, // ✅ Pass tag to Redux action
+          page: 1
+        })
+    );
+  }, [dispatch, sortOption, searchQuery, spaceQuery, tagQuery]);
 
   useEffect(() => {
     setPage(1);

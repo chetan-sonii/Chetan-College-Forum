@@ -24,7 +24,8 @@ export const getTopicComments = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(`/api/comments/${id}`);
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -36,7 +37,8 @@ export const deleteComment = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const { data } = await axios.delete(`/api/comments/${id}`);
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -52,7 +54,8 @@ export const addComment = createAsyncThunk(
                 comment,
                 parentComment,
             });
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -64,7 +67,8 @@ export const toggleUpvoteComment = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const { data } = await axios.post(`/api/comments/${id}/upvote`);
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -76,7 +80,8 @@ export const toggleDownvoteComment = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const { data } = await axios.post(`/api/comments/${id}/downvote`);
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -88,7 +93,8 @@ export const getTopHelpers = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(`/api/comments/helpers`);
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }

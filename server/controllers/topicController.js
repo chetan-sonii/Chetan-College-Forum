@@ -6,7 +6,8 @@ const Space = require("../models/spaceModel");
 module.exports = {
   getAllTopics: async (req, res) => {
     try {
-      const { search, sort, space, page = 1, limit = 10 } = req.query;
+      // ✅ ADD 'tag' to query parameters
+      const { search, sort, space, tag, page = 1, limit = 10 } = req.query;
       const pageNum = parseInt(page);
       const limitNum = parseInt(limit);
       const skip = (pageNum - 1) * limitNum;
@@ -16,6 +17,17 @@ module.exports = {
 
       if (search) searchQuery.title = new RegExp(search, "i");
       if (space && space !== "undefined") searchQuery.space = space;
+
+      // ✅ NEW: Filter by Tag Name
+      if (tag && tag !== "undefined" && tag !== "") {
+        const tagDoc = await Tag.findOne({ name: tag });
+        if (tagDoc) {
+          searchQuery.tags = tagDoc._id;
+        } else {
+          // If tag doesn't exist, return empty list immediately
+          return res.status(200).json({ topics: [], currentPage: 1, totalPages: 0, totalTopics: 0 });
+        }
+      }
 
       if (sort === "popular") sortOptions = { viewsCount: -1 };
       else if (sort === "most_replied") sortOptions = { totalComments: -1 };
@@ -35,14 +47,13 @@ module.exports = {
 
       return res.status(200).json({ topics, currentPage: pageNum, totalPages, totalTopics });
     } catch (err) {
-	console.log(err);
-
-
+      console.log(err);
       return res.status(500).json({ message: err.message });
     }
   },
 
   getTopic: async (req, res) => {
+    // ... (Keep existing getTopic code)
     const { slug } = req.params;
     try {
       const topic = await Topic.findOneAndUpdate(
@@ -52,24 +63,21 @@ module.exports = {
       )
           .populate('author', 'firstName lastName username avatar')
           .populate('space', 'name')
+          // ✅ Populate tags here too just in case
+          .populate('tags')
           .lean()
           .exec();
-      console.log(topic);
-      console.log("\n\n\n\n\n\n");
       return res.status(200).json(topic);
     } catch (err) {
-	console.log(err);
-
-
+      console.log(err);
       console.log(err.message);
     }
   },
 
-  // ✅ THIS IS THE FIXED FUNCTION
   addTopic: async (req, res) => {
     try {
-      // ✅ FIX 1: Extract 'poll' from req.body
-      const { title, content, space, tags, poll } = req.body;
+      // ✅ FIX: Read 'selectedTags' instead of 'tags'
+      const { title, content, space, selectedTags, poll } = req.body;
 
       // 1. Generate Slug
       const slug = title
@@ -77,23 +85,48 @@ module.exports = {
           .replace(/ /g, "-")
           .replace(/[^\w-]+/g, "");
 
-      // 2. Create the topic
+      // 2. Process Poll Data (Keep your existing poll fix)
+      let pollData = null;
+      if (poll) {
+        const days = poll.duration || 1;
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + days);
+        const options = poll.options.map((opt) => ({ text: opt, votes: 0 }));
+        pollData = { question: poll.question, options: options, expiresAt: expiresAt, voters: [] };
+      }
+
+      // 3. ✅ NEW: Process Tags (Find or Create)
+      const tagIds = [];
+      if (selectedTags && selectedTags.length > 0) {
+        for (const tagItem of selectedTags) {
+          // Frontend sends objects { label: 'name', value: 'name' }
+          const tagName = tagItem.value || tagItem;
+
+          let tagDoc = await Tag.findOne({ name: tagName });
+          if (!tagDoc) {
+            tagDoc = await Tag.create({ name: tagName });
+          }
+          tagIds.push(tagDoc._id);
+        }
+      }
+
+      // 4. Create the topic
       let newTopic = await Topic.create({
         title,
         content,
         space,
-        tags,
+        tags: tagIds, // ✅ Save the processed ObjectIds
         slug: slug,
         owner: req.user.username,
         author: req.user._id,
-        poll: poll, //
+        poll: pollData,
       });
 
-      // 3. Populate the author details immediately
-      newTopic = await newTopic.populate({
-        path: "author",
-        select: "firstName lastName username avatar",
-      });
+      // 5. Populate details
+      newTopic = await newTopic.populate([
+        { path: "author", select: "firstName lastName username avatar" },
+        { path: "tags" } // Populate tags for immediate display
+      ]);
 
       return res.status(201).json(newTopic);
     } catch (err) {

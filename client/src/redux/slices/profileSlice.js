@@ -30,7 +30,8 @@ export const getUserProfile = createAsyncThunk(
     async (username, { rejectWithValue }) => {
         try {
             const { data } = await axios.get(`/api/user/${username}`);
-            return data;
+            console.log(data);
+return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
         }
@@ -42,7 +43,8 @@ export const getUserComments = createAsyncThunk(
     async (username, { rejectWithValue }) => {
       try {
         const { data } = await axios.get(`/api/user/${username}/comments`);
-        return data;
+        console.log(data);
+return data;
       } catch (err) {
         console.log(err.message);
         return rejectWithValue(err.message);
@@ -55,7 +57,8 @@ export const getUserFollowing = createAsyncThunk(
     async (username, { rejectWithValue }) => {
       try {
         const { data } = await axios.get(`/api/user/${username}/following`);
-        return data;
+        console.log(data);
+return data;
       } catch (err) {
         console.log(err.message);
         return rejectWithValue(err.message);
@@ -68,7 +71,8 @@ export const getUserFollowers = createAsyncThunk(
     async (username, { rejectWithValue }) => {
       try {
         const { data } = await axios.get(`/api/user/${username}/followers`);
-        return data;
+        console.log(data);
+return data;
       } catch (err) {
         console.log(err.message);
         return rejectWithValue(err.message);
