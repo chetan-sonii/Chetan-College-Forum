@@ -41,4 +41,19 @@ const generateRefreshToken = (user, expiration) => {
   }
 };
 
-module.exports = { generateAccessToken, generateRefreshToken };
+const createAccessToken = (payload) => {
+  try {
+    return jwt.sign(
+        payload,
+        process.env.ACCESS_TOKEN_SECRET_KEY,
+        {
+          expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
+        }
+    );
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
+module.exports = { generateAccessToken, generateRefreshToken,createAccessToken };

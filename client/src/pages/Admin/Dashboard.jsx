@@ -1,9 +1,13 @@
 import { useEffect } from "react";
-import { Row, Col, Card, Table, Spinner, Alert } from "react-bootstrap";
+import { Row, Col, Card, Table, Spinner, Alert, ProgressBar } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getAdminStats } from "../../redux/slices/adminSlice";
-import { MdPeople, MdTopic, MdComment, MdTag } from "react-icons/md";
+import { MdPeople, MdTopic, MdComment, MdTag, MdTrendingUp, MdPieChart } from "react-icons/md";
 import moment from "moment";
+import {
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    PieChart, Pie, Cell, Legend, AreaChart, Area
+} from "recharts";
 
 const Dashboard = () => {
     const dispatch = useDispatch();
@@ -13,101 +17,168 @@ const Dashboard = () => {
         dispatch(getAdminStats());
     }, [dispatch]);
 
-    if (isLoading) {
-        return (
-            <div className="d-flex justify-content-center align-items-center" style={{ height: "60vh" }}>
-                <Spinner animation="border" variant="primary" />
-            </div>
-        );
-    }
+    if (isLoading) return <div className="d-flex justify-content-center p-5"><Spinner animation="border" /></div>;
+    if (error) return <Alert variant="danger">{error}</Alert>;
 
-    if (error) {
-        return <Alert variant="danger">Error loading stats: {error}</Alert>;
-    }
+    const { counts, recentUsers, charts } = stats || {};
+    const { totalUsers, totalTopics, totalComments, totalTags } = counts || {};
+    const { growthData, topicsPerSpace } = charts || {};
 
-    // Destructure data safely
-    const { counts, recentUsers } = stats || {};
-    const { totalUsers = 0, totalTopics = 0, totalComments = 0, totalTags = 0 } = counts || {};
+    // Colors for Pie Chart
+    const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
 
-    // Reusable Stat Card Component
-    const StatCard = ({ title, count, icon, color }) => (
-        <Card className={`border-0 shadow-sm mb-4 border-start border-4 border-${color}`}>
-            <Card.Body className="d-flex align-items-center justify-content-between p-4">
-                <div>
-                    <h6 className="text-muted text-uppercase fw-bold mb-1" style={{ fontSize: "0.8rem", letterSpacing: "0.5px" }}>
-                        {title}
-                    </h6>
-                    <h2 className="mb-0 fw-bold">{count}</h2>
+    // Reusable Stat Card
+    const StatCard = ({ title, count, icon, color, bg }) => (
+        <Card className="border-0 shadow-sm h-100 overflow-hidden">
+            <Card.Body className="position-relative">
+                <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                        <p className="text-muted text-uppercase fw-bold small mb-1">{title}</p>
+                        <h3 className="fw-bold mb-0">{count}</h3>
+                    </div>
+                    <div className={`p-3 rounded-circle text-white shadow-sm`} style={{ backgroundColor: color }}>
+                        {icon}
+                    </div>
                 </div>
-                <div className={`bg-${color} bg-opacity-10 p-3 rounded-circle text-${color} d-flex align-items-center justify-content-center`} style={{ width: "60px", height: "60px" }}>
-                    {icon}
+                <div className="mt-4">
+                    <ProgressBar now={70} variant={bg} style={{ height: "4px" }} />
                 </div>
             </Card.Body>
         </Card>
     );
 
     return (
-        <div>
-            <h3 className="fw-bold mb-4 text-dark">Dashboard Overview</h3>
+        <div className="admin-dashboard fade-in">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 className="fw-bold text-dark mb-0">Dashboard Overview</h3>
+                    <p className="text-muted small">Welcome back, Admin</p>
+                </div>
+            </div>
 
-            {/* 1. Statistics Cards */}
-            <Row>
-                <Col md={6} xl={3}>
-                    <StatCard title="Total Users" count={totalUsers} icon={<MdPeople size={28} />} color="primary" />
+            {/* 1. Statistics Row */}
+            <Row className="g-4 mb-4">
+                <Col md={3}>
+                    <StatCard title="Total Users" count={totalUsers} icon={<MdPeople size={24} />} color="#4e73df" bg="primary" />
                 </Col>
-                <Col md={6} xl={3}>
-                    <StatCard title="Total Topics" count={totalTopics} icon={<MdTopic size={28} />} color="success" />
+                <Col md={3}>
+                    <StatCard title="Total Topics" count={totalTopics} icon={<MdTopic size={24} />} color="#1cc88a" bg="success" />
                 </Col>
-                <Col md={6} xl={3}>
-                    <StatCard title="Total Comments" count={totalComments} icon={<MdComment size={28} />} color="warning" />
+                <Col md={3}>
+                    <StatCard title="Total Comments" count={totalComments} icon={<MdComment size={24} />} color="#f6c23e" bg="warning" />
                 </Col>
-                <Col md={6} xl={3}>
-                    <StatCard title="Total Tags" count={totalTags} icon={<MdTag size={28} />} color="info" />
+                <Col md={3}>
+                    <StatCard title="Tags Created" count={totalTags} icon={<MdTag size={24} />} color="#36b9cc" bg="info" />
                 </Col>
             </Row>
 
-            {/* 2. Recent Registrations Table */}
-            <Row className="mt-4">
+            {/* 2. Charts Row */}
+            <Row className="g-4 mb-4">
+                {/* Line Chart: Activity Growth */}
+                <Col lg={8}>
+                    <Card className="border-0 shadow-sm h-100">
+                        <Card.Header className="bg-white border-bottom-0 py-3 d-flex align-items-center justify-content-between">
+                            <h6 className="m-0 fw-bold text-primary"><MdTrendingUp className="me-2" /> Platform Growth (30 Days)</h6>
+                        </Card.Header>
+                        <Card.Body>
+                            <div style={{ width: '100%', height: 300 }}>
+                                <ResponsiveContainer>
+                                    <AreaChart data={growthData}>
+                                        <defs>
+                                            <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#4e73df" stopOpacity={0.8}/>
+                                                <stop offset="95%" stopColor="#4e73df" stopOpacity={0}/>
+                                            </linearGradient>
+                                            <linearGradient id="colorTopics" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#1cc88a" stopOpacity={0.8}/>
+                                                <stop offset="95%" stopColor="#1cc88a" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                        <XAxis dataKey="date" tick={{fontSize: 12}} tickFormatter={(str) => moment(str).format('MMM D')} />
+                                        <YAxis />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                            labelFormatter={(label) => moment(label).format('MMMM Do, YYYY')}
+                                        />
+                                        <Legend />
+                                        <Area type="monotone" dataKey="users" name="New Users" stroke="#4e73df" fillOpacity={1} fill="url(#colorUsers)" />
+                                        <Area type="monotone" dataKey="topics" name="New Topics" stroke="#1cc88a" fillOpacity={1} fill="url(#colorTopics)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                {/* Pie Chart: Topic Distribution */}
+                <Col lg={4}>
+                    <Card className="border-0 shadow-sm h-100">
+                        <Card.Header className="bg-white border-bottom-0 py-3">
+                            <h6 className="m-0 fw-bold text-dark"><MdPieChart className="me-2" /> Popular Spaces</h6>
+                        </Card.Header>
+                        <Card.Body className="d-flex align-items-center justify-content-center">
+                            <div style={{ width: '100%', height: 300 }}>
+                                <ResponsiveContainer>
+                                    <PieChart>
+                                        <Pie
+                                            data={topicsPerSpace}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="count"
+                                            nameKey="_id"
+                                        >
+                                            {topicsPerSpace?.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                        <Legend layout="vertical" verticalAlign="middle" align="right" />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+
+            {/* 3. Recent Users Table */}
+            <Row>
                 <Col md={12}>
                     <Card className="border-0 shadow-sm">
-                        <Card.Header className="bg-white border-bottom py-3">
-                            <h5 className="mb-0 fw-bold text-dark">Recent Registrations</h5>
+                        <Card.Header className="bg-white py-3 border-bottom">
+                            <h6 className="m-0 fw-bold text-dark">Recently Joined Users</h6>
                         </Card.Header>
-                        <Card.Body className="p-0">
-                            <Table responsive hover className="mb-0 align-middle text-nowrap">
-                                <thead className="bg-light text-muted">
-                                <tr>
-                                    <th className="ps-4 py-3">User</th>
-                                    <th className="py-3">Email</th>
-                                    <th className="py-3">Joined Date</th>
-                                    <th className="py-3">Status</th>
+                        <Table responsive hover className="mb-0 align-middle">
+                            <thead className="bg-light text-muted small text-uppercase">
+                            <tr>
+                                <th className="ps-4 border-0">User</th>
+                                <th className="border-0">Email</th>
+                                <th className="border-0">Join Date</th>
+                                <th className="border-0">Role</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {recentUsers?.map((user) => (
+                                <tr key={user._id}>
+                                    <td className="ps-4">
+                                        <div className="d-flex align-items-center">
+                                            <div className="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style={{width: 35, height: 35}}>
+                                                {user.avatar?.url ? <img src={user.avatar.url} className="rounded-circle w-100 h-100" alt="" /> : <MdPeople />}
+                                            </div>
+                                            <span className="fw-semibold text-dark">{user.username}</span>
+                                        </div>
+                                    </td>
+                                    <td className="text-muted small">{user.email}</td>
+                                    <td className="text-muted small">{moment(user.createdAt).fromNow()}</td>
+                                    <td><span className="badge bg-primary bg-opacity-10 text-primary">User</span></td>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                {recentUsers?.map((user) => (
-                                    <tr key={user._id}>
-                                        <td className="ps-4 fw-bold text-primary">
-                                            @{user.username}
-                                        </td>
-                                        <td>{user.email}</td>
-                                        <td>{moment(user.createdAt).format("MMM Do YYYY, h:mm a")}</td>
-                                        <td>
-                        <span className="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
-                          Active
-                        </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(!recentUsers || recentUsers.length === 0) && (
-                                    <tr>
-                                        <td colSpan="4" className="text-center py-5 text-muted">
-                                            No recent users found.
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </Table>
-                        </Card.Body>
+                            ))}
+                            </tbody>
+                        </Table>
                     </Card>
                 </Col>
             </Row>

@@ -42,6 +42,32 @@ export const getAdminStats = createAsyncThunk(
     }
 );
 
+// 1. Get Users Thunk
+export const getAdminUsers = createAsyncThunk(
+    "admin/getUsers",
+    async (searchQuery = "", { rejectWithValue }) => {
+        try {
+            const { data } = await axios.get(`/api/admin/users?search=${searchQuery}`);
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
+
+// 2. Manage User Thunk (Ban/Delete)
+export const manageUser = createAsyncThunk(
+    "admin/manageUser",
+    async ({ id, action }, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.post(`/api/admin/users/${id}/manage`, { action });
+            return data;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
+
 const adminSlice = createSlice({
     name: "admin",
     initialState: {
@@ -50,6 +76,8 @@ const adminSlice = createSlice({
         stats: null,
         isLoading: false,
         error: null,
+        usersList: [],
+        usersLoading: false,
     },
     reducers: {
         adminLogout: (state) => {
@@ -76,6 +104,27 @@ const adminSlice = createSlice({
             // Stats
             .addCase(getAdminStats.fulfilled, (state, action) => {
                 state.stats = action.payload;
+            })
+
+            .addCase(getAdminUsers.pending, (state) => { state.usersLoading = true; })
+            .addCase(getAdminUsers.fulfilled, (state, action) => {
+                state.usersLoading = false;
+                state.usersList = action.payload;
+            })
+
+            // Manage User (Update Local State Optimistically)
+            .addCase(manageUser.fulfilled, (state, action) => {
+                const { userId, action: userAction } = action.payload;
+
+                if (userAction === "delete") {
+                    state.usersList = state.usersList.filter(u => u._id !== userId);
+                } else if (userAction === "ban") {
+                    const user = state.usersList.find(u => u._id === userId);
+                    if (user) user.isBanned = true;
+                } else if (userAction === "unban") {
+                    const user = state.usersList.find(u => u._id === userId);
+                    if (user) user.isBanned = false;
+                }
             });
     },
 });

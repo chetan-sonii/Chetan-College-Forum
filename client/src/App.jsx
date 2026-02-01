@@ -4,7 +4,8 @@ import {
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
+  Outlet,
+} from "react-router-dom"; //
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Header from "./components/Header";
@@ -27,73 +28,103 @@ import "./App.css";
 import "./poll.css";
 import "./Responsive.css";
 import { useSelector } from "react-redux";
-import SavedTab from "./components/Profile/Tabs/SavedTab";
+
+// ✅ Admin Imports
 import AdminLogin from "./pages/Admin/AdminLogin";
 import AdminLayout from "./components/Admin/AdminLayout";
 import Dashboard from "./pages/Admin/Dashboard";
+import UsersTable from "./pages/Admin/UsersTable";
+
+// ✅ 1. Create a Layout for the Main Website (Includes Header)
+const MainLayout = () => {
+  return (
+      <>
+        <Header />
+        <Outlet /> {/* This renders the child route (Home, Profile, etc.) */}
+      </>
+  );
+};
 
 const App = () => {
-  // We keep the useSelector to ensure the component re-renders when Redux auth state changes
   const { isLoggedIn } = useSelector((state) => state.auth);
-
-  // Calculate auth state on every render
-  const isAuth = !!localStorage.getItem("isLoggedIn");
+  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
 
   return (
       <Router>
-        <Header />
         <Routes>
+          {/* ====================================================
+            ADMIN ROUTES (No Header, Separate Layout)
+           ==================================================== */}
 
-          <Route path="*" element={<NotFound />} />
+          {/* Admin Login Page */}
           <Route path="/admin/login" element={<AdminLogin />} />
+
+          {/* Protected Admin Dashboard */}
+          {/* AdminLayout already handles the check for adminToken.
+            If a regular user tries to go here, they will be redirected to Admin Login
+            because they lack the admin token. */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
-            {/* Add users/tags routes later */}
+            <Route path="users" element={<UsersTable />} />
+            {/* Add future admin tabs here (Users, Tags) */}
           </Route>
-          <Route
-              path="/register"
-              element={isAuth ? <Navigate replace to="/" /> : <Register />}
-          />
-          <Route
-              path="/login"
-              element={isAuth ? <Navigate replace to="/" /> : <Login />}
-          />
-          <Route
-              path="/verify-email"
-              element={isAuth ? <Navigate replace to="/" /> : <EmailVerify />}
-          />
-          <Route
-              path="/forgot-password"
-              element={isAuth ? <Navigate replace to="/" /> : <ForgotPassword />}
-          />
-          <Route
-              path="/reset-password"
-              element={isAuth ? <Navigate replace to="/" /> : <ResetPassword />}
-          />
-          <Route path="/" element={<Home />} />
-          <Route path="/space/:space" element={<Home />} />
-          <Route path="/topics/:id/:slug" element={<Topic />} />
-          <Route
-              path="/topic/new"
-              element={!isAuth ? <Navigate replace to="/login" /> : <NewTopic />}
-          />
-          <Route path="/user/:username" element={<Profile />}>
-            <Route path="topics" element={<TopicsTab />} />
-            <Route path="upvotes" element={<UpvotedTab />} />
-            <Route path="comments" element={<CommentsTab />} />
-            <Route path="following" element={<FollowingTab />} />
-            <Route path="followers" element={<FollowersTab />} />
-            <Route path="saved" element={<SavedTab />} />
+
+
+          {/* ====================================================
+            MAIN WEBSITE ROUTES (Wrapped in MainLayout with Header)
+           ==================================================== */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/space/:space" element={<Home />} />
+
+            <Route
+                path="/register"
+                element={isAuth ? <Navigate replace to="/" /> : <Register />}
+            />
+            <Route
+                path="/login"
+                element={isAuth ? <Navigate replace to="/" /> : <Login />}
+            />
+            <Route
+                path="/verify-email"
+                element={isAuth ? <Navigate replace to="/" /> : <EmailVerify />}
+            />
+            <Route
+                path="/forgot-password"
+                element={isAuth ? <Navigate replace to="/" /> : <ForgotPassword />}
+            />
+            <Route
+                path="/reset-password"
+                element={isAuth ? <Navigate replace to="/" /> : <ResetPassword />}
+            />
+
+            <Route path="/topics/:id/:slug" element={<Topic />} />
+            <Route
+                path="/topic/new"
+                element={!isAuth ? <Navigate replace to="/login" /> : <NewTopic />}
+            />
+
+            <Route path="/user/:username" element={<Profile />}>
+              <Route index element={<TopicsTab />} /> {/* Default to Topics */}
+              <Route path="topics" element={<TopicsTab />} />
+              <Route path="upvoted" element={<UpvotedTab />} />
+              <Route path="comments" element={<CommentsTab />} />
+              <Route path="following" element={<FollowingTab />} />
+              <Route path="followers" element={<FollowersTab />} />
+            </Route>
+
+            <Route
+                path="/user/:username/edit"
+                element={
+                  !isAuth ? <Navigate replace to="/login" /> : <EditProfile />
+                }
+            />
+
+            <Route path="*" element={<NotFound />} />
           </Route>
-          <Route
-              path="/user/:username/edit"
-              element={
-                !isAuth ? <Navigate replace to="/login" /> : <EditProfile />
-              }
-          />
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
   );
 };
+
 export default App;

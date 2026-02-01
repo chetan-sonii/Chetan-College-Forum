@@ -4,6 +4,7 @@ const UserSchema = new mongoose.Schema(
     {
       firstName: String,
       lastName: String,
+        isBanned: { type: Boolean, default: false },
       email: {
         type: String,
         unique: true,
