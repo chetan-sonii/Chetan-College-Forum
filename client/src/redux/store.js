@@ -3,6 +3,7 @@ import authReducer from './slices/authSlice';
 import topicSlice from './slices/topicSlice';
 import commentSlice from './slices/commentSlice';
 import profileSlice from './slices/profileSlice';
+import adminReducer from "./slices/adminSlice";
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
       topic: topicSlice,
       comment: commentSlice,
       profile: profileSlice,
+        admin: adminReducer,
     },
   });  
 

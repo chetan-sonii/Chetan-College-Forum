@@ -11,6 +11,7 @@ const authRoutes = require("./routes/authRoutes");
 const topicRoutes = require("./routes/topicRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const path = require("path");
 const http = require("http"); // Import HTTP module
 const { Server } = require("socket.io"); // Import Socket.io
@@ -83,6 +84,7 @@ app.use("/api/user", userRoutes);
 
 // static uploads (optional; helpful if you serve images from /uploads)
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/api/admin", adminRoutes);
 
 // --- Error handlers ---
 // 404

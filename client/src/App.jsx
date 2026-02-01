@@ -28,13 +28,16 @@ import "./poll.css";
 import "./Responsive.css";
 import { useSelector } from "react-redux";
 import SavedTab from "./components/Profile/Tabs/SavedTab";
+import AdminLogin from "./pages/Admin/AdminLogin";
+import AdminLayout from "./components/Admin/AdminLayout";
+import Dashboard from "./pages/Admin/Dashboard";
 
 const App = () => {
   // We keep the useSelector to ensure the component re-renders when Redux auth state changes
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   // Calculate auth state on every render
-  const isAuth = localStorage.getItem("isLoggedIn") ? true : false;
+  const isAuth = !!localStorage.getItem("isLoggedIn");
 
   return (
       <Router>
@@ -42,6 +45,11 @@ const App = () => {
         <Routes>
 
           <Route path="*" element={<NotFound />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            {/* Add users/tags routes later */}
+          </Route>
           <Route
               path="/register"
               element={isAuth ? <Navigate replace to="/" /> : <Register />}

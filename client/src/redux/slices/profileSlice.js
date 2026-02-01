@@ -46,7 +46,7 @@ export const getUserUpvotedTopics = createAsyncThunk(
     "profile/getUserUpvotedTopics",
     async (username, { rejectWithValue }) => {
         try {
-            const { data } = await axios.get(`/api/users/${username}/upvoted`);
+            const { data } = await axios.get(`/api/user/${username}/upvoted`);
             return data;
         } catch (err) {
             return rejectWithValue(err.response.data);
