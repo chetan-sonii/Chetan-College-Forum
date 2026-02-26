@@ -30,6 +30,8 @@ import "./poll.css";
 import "./Responsive.css";
 import { useSelector } from "react-redux";
 import axios from "./utils/axios";
+// Add this line with your other imports
+import SavedTab from "./components/Profile/Tabs/SavedTab";
 
 
 // ✅ Admin Imports
@@ -125,8 +127,7 @@ const App = () => {
               <Route path="comments" element={<CommentsTab />} />
               <Route path="following" element={<FollowingTab />} />
               <Route path="followers" element={<FollowersTab />} />
-              {/* Note: Ensure 'saved' route is added here if you implemented SavedTab */}
-              {/* <Route path="saved" element={<SavedTab />} /> */}
+              <Route path="saved-topics" element={<SavedTab />} />s
             </Route>
 
             <Route
