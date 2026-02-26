@@ -29,7 +29,7 @@ const ProfileHeader = memo(() => {
   const pathPart = location.pathname.split("/").pop();
   const activeKey = pathPart === username ? "topics" : pathPart;
   useEffect(() => {
-    if (username) document.title = `${username} Profile | CHETAN Forum`;
+    if (username) document.title = `${username} Profile | Education Forum`;
   }, [username]);
 
   useMemo(() => {

@@ -5,7 +5,7 @@ import Error404 from "../assets/lotties/error-404-not-found.json";
 
 const NotFound = () => {
     useEffect(() => {
-        document.title = "Page Not Found | CHETAN Forum";
+        document.title = "Page Not Found | Education Forum";
     }, []);
 
     return (

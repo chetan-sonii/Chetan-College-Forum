@@ -25,7 +25,7 @@ const Login = () => {
   );
 
   useEffect(() => {
-    document.title = "Login | CHETAN Forum";
+    document.title = "Login | Education Forum";
   }, []);
 
   const handleSubmit = async (e) => {
@@ -65,7 +65,7 @@ const Login = () => {
                 {isLoading && <div className="loader"></div>}
                 <h3 className="text-center">Login</h3>
                 <p className="text-center">
-                  Welcome to CHETAN, a platform to connect with the world.
+                  Welcome to Education, a platform to connect with the world.
                 </p>
                 {message && (
                     <div

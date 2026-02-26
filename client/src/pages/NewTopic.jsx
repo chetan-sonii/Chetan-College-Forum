@@ -31,7 +31,7 @@ const NewTopic = () => {
   const { spaces } = useSelector((state) => state.topic);
 
   useEffect(() => {
-    document.title = "Create New Topic | CHETAN Forum";
+    document.title = "Create New Topic | Education Forum";
     dispatch(getSpaces());
     dispatch(resetNewTopic());
   }, [dispatch]);

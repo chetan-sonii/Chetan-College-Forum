@@ -18,7 +18,7 @@ import { register, resetRegister } from "../redux/slices/authSlice";
 
 const Register = () => {
   useEffect(() => {
-    document.title = "Register | CHETAN Forum";
+    document.title = "Register | Education Forum";
   }, []);
 
   const [username, setUsername] = useState("");
@@ -67,7 +67,7 @@ const Register = () => {
                 {isLoading && <div className="loader"></div>}
                 <h3 className="text-center">Register</h3>
                 <p className="text-center">
-                  Welcome to CHETAN, a platform to connect with the world.
+                  Welcome to Education, a platform to connect with the world.
                 </p>
                 {message && (
                     <div

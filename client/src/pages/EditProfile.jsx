@@ -23,7 +23,7 @@ const EditProfile = () => {
   // Set document title
   useEffect(() => {
     if (username)
-      document.title = `${username} - Edit Profile | CHETAN Forum`;
+      document.title = `${username} - Edit Profile | Education Forum`;
   }, [username]);
 
   // Fetch user profile data

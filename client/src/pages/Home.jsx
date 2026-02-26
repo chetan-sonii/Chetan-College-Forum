@@ -26,9 +26,9 @@ const Home = () => {
 
   // 2. Set Page Title
   useEffect(() => {
-    if (space) document.title = `${space} Space | CHETAN Forum`;
-    else if (tag) document.title = `${tag} - Tag | CHETAN Forum`;
-    else document.title = "Home | CHETAN Forum";
+    if (space) document.title = `${space} Space | Education Forum`;
+    else if (tag) document.title = `${tag} - Tag | Education Forum`;
+    else document.title = "Home | Education Forum";
   }, [space, tag]);
 
   // 3. Fetch Topics with ALL filters (Space, Tag, Search, Sort)

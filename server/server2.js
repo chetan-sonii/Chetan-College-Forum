@@ -30,7 +30,7 @@ const server = http.createServer(app); // Wrap Express app with HTTP server
 // --- Socket.io Setup ---
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: CLIENT_URL,
         methods: ["GET", "POST"],
         credentials: true,
     },
@@ -71,7 +71,7 @@ app.use(
 // CORS
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: CLIENT_URL,
         credentials: true,
     })
 );

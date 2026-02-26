@@ -22,7 +22,7 @@ const ForgotPassword = () => {
   );
 
   useEffect(() => {
-    document.title = "Forgot Password | CHETAN Forum";
+    document.title = "Forgot Password | Education Forum";
   }, []);
 
   const handleSubmit = async (e) => {

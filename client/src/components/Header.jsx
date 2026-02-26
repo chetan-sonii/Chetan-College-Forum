@@ -67,7 +67,7 @@ const Header = () => {
             <div className="logo-icon">
               <RiFlashlightFill />
             </div>
-            <span className="logo-text">CHETAN</span>
+            <span className="logo-text">Education</span>
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="responsive-navbar-nav" className="border-0 shadow-none" />

@@ -34,7 +34,7 @@ const EmailVerify = () => {
   const emailVerifyState = useSelector((state) => state.auth.emailVerify);
 
   useEffect(() => {
-    document.title = "Email Verification | CHETAN Forum";
+    document.title = "Email Verification | Education Forum";
   }, []);
 
   useEffect(() => {
