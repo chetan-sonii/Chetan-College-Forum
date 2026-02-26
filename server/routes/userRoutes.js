@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require("../controllers/userController");
 const validateAccessToken = require("../middlewares/validateAccessToken");
 
-router.get("/saved-topics", validateAccessToken, userController.getSavedTopics);
+router.get("/:username/saved-topics", validateAccessToken, userController.getSavedTopics);
 router.get("/:username/upvoted", userController.getUpvotedTopics);
 router.get("/:username", userController.getUserProfile);
 router.get("/:username/comments", userController.getUserComments);
